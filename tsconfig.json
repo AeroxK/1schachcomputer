@@ -1,8 +1,9 @@
 {
     "extends": "@tsconfig/recommended/tsconfig.json",
     "compilerOptions": {
+        "jsx": "react",
         "outDir": "dist"
     },
-    "include": ["src/**/*"],
+    "include": ["src/backend/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
 }

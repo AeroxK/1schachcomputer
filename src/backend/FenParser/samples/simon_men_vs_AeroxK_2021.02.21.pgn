@@ -1,0 +1,40 @@
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2021.02.21"]
+[Round "?"]
+[White "simon_men"]
+[Black "AeroxK"]
+[Result "0-1"]
+[ECO "B10"]
+[WhiteElo "1861"]
+[BlackElo "1931"]
+[TimeControl "600"]
+[EndTime "1:56:14 PST"]
+[Termination "AeroxK won by checkmate"]
+
+1. e4 {[%timestamp 31]} 1... c6 {[%timestamp 15]} 2. Bc4 {[%timestamp 25]} 2...
+d5 {[%timestamp 9]} 3. exd5 {[%timestamp 66]} 3... cxd5 {[%timestamp 1]} 4. Bb5+
+{[%timestamp 24]} 4... Bd7 {[%timestamp 46]} 5. Bxd7+ {[%timestamp 21]} 5...
+Qxd7 {[%timestamp 135]} 6. Nf3 {[%timestamp 20]} 6... Nc6 {[%timestamp 13]} 7.
+O-O {[%timestamp 47]} 7... e6 {[%timestamp 39]} 8. d3 {[%timestamp 30]} 8... Bd6
+{[%timestamp 82]} 9. Nc3 {[%timestamp 34]} 9... Rc8 {[%timestamp 150]} 10. Qe1
+{[%timestamp 135]} 10... Nge7 {[%timestamp 60]} 11. Bg5 {[%timestamp 127]} 11...
+O-O {[%timestamp 41]} 12. Bxe7 {[%timestamp 226]} 12... Qxe7 {[%timestamp 204]}
+13. Nb5 {[%timestamp 96]} 13... Bb8 {[%timestamp 31]} 14. Nbd4 {[%timestamp 54]}
+14... Nxd4 {[%timestamp 144]} 15. Nxd4 {[%timestamp 29]} 15... Bxh2+
+{[%timestamp 43]} 16. Kxh2 {[%timestamp 102]} 16... Qh4+ {[%timestamp 18]} 17.
+Kg1 {[%timestamp 16]} 17... Qxd4 {[%timestamp 19]} 18. Qd2 {[%timestamp 34]}
+18... Qf6 {[%timestamp 983]} 19. c3 {[%timestamp 29]} 19... d4 {[%timestamp 56]}
+20. Rac1 {[%timestamp 118]} 20... Rc5 {[%timestamp 565]} 21. cxd4 {[%timestamp
+148]} 21... Rd5 {[%timestamp 621]} 22. Rc7 {[%timestamp 227]} 22... Rh5
+{[%timestamp 243]} 23. Qe3 {[%timestamp 347]} 23... g6 {[%timestamp 402]} 24. f3
+{[%timestamp 224]} 24... Rb5 {[%timestamp 473]} 25. b3 {[%timestamp 75]} 25...
+Rd8 {[%timestamp 31]} 26. Rc4 {[%timestamp 122]} 26... Rbd5 {[%timestamp 95]}
+27. Rfc1 {[%timestamp 135]} 27... Rxd4 {[%timestamp 62]} 28. Rc8 {[%timestamp
+37]} 28... Kg7 {[%timestamp 128]} 29. Rxd8 {[%timestamp 107]} 29... Qxd8
+{[%timestamp 268]} 30. Rc3 {[%timestamp 56]} 30... Qd6 {[%timestamp 76]} 31. f4
+{[%timestamp 145]} 31... Rxf4 {[%timestamp 110]} 32. Qxa7 {[%timestamp 84]}
+32... Qb4 {[%timestamp 170]} 33. Rc1 {[%timestamp 116]} 33... b6 {[%timestamp
+327]} 34. Qa4 {[%timestamp 171]} 34... Qd2 {[%timestamp 35]} 35. Qa3
+{[%timestamp 93]} 35... Qf2+ {[%timestamp 21]} 36. Kh2 {[%timestamp 83]} 36...
+Rh4# {[%timestamp 1]} 0-1
