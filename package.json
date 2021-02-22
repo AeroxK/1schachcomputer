@@ -6,10 +6,13 @@
   "scripts": {
     "build": "npm run clean && tsc && webpack",
     "clean": "shx rm -rf dist",
-    "dev-server": "nodemon dist/backend/index.js",
+    "dev": "concurrently --names \"NODEMON,TSC,WEBPACK\" -c \"#ba68c8,#9575cd,#f06292\" \"npm run watch:server\" \"npm run watch:backend\" \"npm run watch:frontend\"",
+    "dev:backend": "concurrently --names \"NODEMON,TSC\" -c \"#ba68c8,#9575cd\" \"npm run watch:server\" \"npm run watch:backend\"",
+    "dev:frontend": "concurrently --names \"NODEMON,WEBPACK\" -c \"#ba68c8,#f06292\" \"npm run watch:server\" \"npm run watch:frontend\"",
     "test": "jest",
-    "watch-backend": "tsc -w",
-    "watch-frontend": "webpack --watch"
+    "watch:backend": "tsc -w",
+    "watch:frontend": "webpack --watch",
+    "watch:server": "nodemon dist/backend/index.js"
   },
   "author": "Alexander König",
   "license": "ISC",
