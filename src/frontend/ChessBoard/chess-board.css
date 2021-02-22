@@ -6,8 +6,8 @@
 }
 
 .board {
-    --dark-square-bg-color: #ccc;
-    --light-square-bg-color: #fff;
+    --dark-square-bg-color: #5f4339;
+    --light-square-bg-color: #be9c91;
 
     position: absolute;
     top: 0;
