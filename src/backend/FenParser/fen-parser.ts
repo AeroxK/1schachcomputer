@@ -1,4 +1,4 @@
-import { ChessGame, ActiveColor, Board, PieceCode } from '../types';
+import { ChessGame, ActiveColor, Board, PieceCode } from '../../shared/types';
 
 const FenSquares = [
     'a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8',

@@ -2,7 +2,7 @@ import { readFile } from 'fs';
 import path from 'path';
 
 import { read, write } from './fen-parser';
-import { PieceCode } from '../types';
+import { PieceCode } from '../../shared/types';
 
 describe('read', () => {
     test('Read initial position', done => {

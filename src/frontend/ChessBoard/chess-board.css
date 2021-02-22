@@ -1,0 +1,53 @@
+.board-wrapper {
+    width: 100%;
+    padding-top: 100%;
+
+    position: relative;
+}
+
+.board {
+    --dark-square-bg-color: #ccc;
+    --light-square-bg-color: #fff;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 100%;
+
+    border: 1px solid var(--dark-square-bg-color);
+}
+
+.square {
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    width: calc(100% / 8);
+    height: calc(100% / 8);
+
+    background: var(--light-square-bg-color);
+}
+
+.square:nth-child(-2n+8), 
+.square:nth-child(8) ~ .square:nth-child(-2n+15), 
+.square:nth-child(16) ~ .square:nth-child(-2n+24),
+.square:nth-child(24) ~ .square:nth-child(-2n+31),
+.square:nth-child(32) ~ .square:nth-child(-2n+40),
+.square:nth-child(40) ~ .square:nth-child(-2n+47),
+.square:nth-child(48) ~ .square:nth-child(-2n+56),
+.square:nth-child(56) ~ .square:nth-child(-2n+63) {
+    background-color: var(--dark-square-bg-color);
+}
+
+.square img {
+    width: 100%;
+    height: 100%;
+}
+
+.square:focus {
+    outline: none;
+}

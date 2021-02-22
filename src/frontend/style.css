@@ -1,7 +1,4 @@
-html, body {
-    background: #00f;
-}
-
-.crazy {
-    background: #0af;
+.container {
+    max-width: 600px;
+    margin: 0 auto;
 }

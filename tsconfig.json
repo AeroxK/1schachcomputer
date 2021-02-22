@@ -2,8 +2,9 @@
     "extends": "@tsconfig/recommended/tsconfig.json",
     "compilerOptions": {
         "jsx": "react",
-        "outDir": "dist"
+        "outDir": "dist",
+        "typeRoots": ["src/@types", "node_modules/@types"]
     },
-    "include": ["src/backend/**/*"],
+    "include": ["src/shared/**/*", "src/backend/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
 }

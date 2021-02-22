@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run clean && tsc && webpack",
     "clean": "shx rm -rf dist",
-    "dev-server": "nodemon dist/index.js",
+    "dev-server": "nodemon dist/backend/index.js",
     "test": "jest",
     "watch-backend": "tsc -w",
     "watch-frontend": "webpack --watch"
