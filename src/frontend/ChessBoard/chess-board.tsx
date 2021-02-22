@@ -4,18 +4,6 @@ import { API_URL } from '../../shared/config';
 import { Board, PieceCode } from '../../shared/types';
 
 import './chess-board.css';
-import BlackRook from './icons/black-rook.svg';
-import BlackKnight from './icons/black-knight.svg';
-import BlackBishop from './icons/black-bishop.svg';
-import BlackQueen from './icons/black-queen.svg';
-import BlackKing from './icons/black-king.svg';
-import BlackPawn from './icons/black-pawn.svg';
-import WhiteRook from './icons/white-rook.svg';
-import WhiteKnight from './icons/white-knight.svg';
-import WhiteBishop from './icons/white-bishop.svg';
-import WhiteQueen from './icons/white-queen.svg';
-import WhiteKing from './icons/white-king.svg';
-import WhitePawn from './icons/white-pawn.svg';
 
 type ChessBoardState = {
     board: Board
@@ -27,18 +15,18 @@ type PieceIconMap = {
 }
 
 const PieceIconMaps: PieceIconMap[] = [
-    { pieceCode: PieceCode.BlackRook, url: BlackRook },
-    { pieceCode: PieceCode.BlackBishop, url: BlackBishop },
-    { pieceCode: PieceCode.BlackKnight, url: BlackKnight },
-    { pieceCode: PieceCode.BlackQueen, url: BlackQueen },
-    { pieceCode: PieceCode.BlackKing, url: BlackKing },
-    { pieceCode: PieceCode.BlackPawn, url: BlackPawn },
-    { pieceCode: PieceCode.WhiteRook, url: WhiteRook },
-    { pieceCode: PieceCode.WhiteBishop, url: WhiteBishop },
-    { pieceCode: PieceCode.WhiteKnight, url: WhiteKnight },
-    { pieceCode: PieceCode.WhiteQueen, url: WhiteQueen },
-    { pieceCode: PieceCode.WhiteKing, url: WhiteKing },
-    { pieceCode: PieceCode.WhitePawn, url: WhitePawn },
+    { pieceCode: PieceCode.BlackRook, url: require('./icons/black-rook.svg') },
+    { pieceCode: PieceCode.BlackBishop, url: require('./icons/black-bishop.svg') },
+    { pieceCode: PieceCode.BlackKnight, url: require('./icons/black-knight.svg') },
+    { pieceCode: PieceCode.BlackQueen, url: require('./icons/black-queen.svg') },
+    { pieceCode: PieceCode.BlackKing, url: require('./icons/black-king.svg') },
+    { pieceCode: PieceCode.BlackPawn, url: require('./icons/black-pawn.svg') },
+    { pieceCode: PieceCode.WhiteRook, url: require('./icons/white-rook.svg') },
+    { pieceCode: PieceCode.WhiteBishop, url: require('./icons/white-bishop.svg') },
+    { pieceCode: PieceCode.WhiteKnight, url: require('./icons/white-knight.svg') },
+    { pieceCode: PieceCode.WhiteQueen, url: require('./icons/white-queen.svg') },
+    { pieceCode: PieceCode.WhiteKing, url: require('./icons/white-king.svg') },
+    { pieceCode: PieceCode.WhitePawn, url: require('./icons/white-pawn.svg') },
 ];
 
 export default class ChessBoard extends React.Component<{}, ChessBoardState> {
