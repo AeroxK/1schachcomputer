@@ -81,7 +81,7 @@ export function read(fen: string): ChessGame {
             queenside: fen_castling_availability.includes(FenCastlingCode.BlackQueenside)
         }
     };
-    const en_passant_square = FenSquares.indexOf(fen_en_passant_square);
+    const en_passant_square = FenSquares.indexOf(fen_en_passant_square) || -1;
     const halfmove_clock = parseInt(fen_halfmove_clock);
     const fullmove_number = parseInt(fen_fullmove_number);
 
