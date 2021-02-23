@@ -1,6 +1,6 @@
 import { PieceCode } from '../../shared/types';
 import { getLegalSquaresForPiece } from './chess-rules';
-import { startingPosition } from './samples/positions';
+import { startingPosition, scandinavian, e4e5 } from './samples/positions';
 
 describe('Test Piece Moves', () => {
 
@@ -14,15 +14,15 @@ describe('Test Piece Moves', () => {
         expect(squares.sort()).toEqual([8,17,18,19,20,21,22,23,24,32,40].sort());
     });
 
-    /*
     test('Knight Moves', () => {
-        let squares = getLegalSquaresForPiece(startingPosition, 57);
-        expect(squares).toEqual([40, 42]);
+        let game = startingPosition;
+        let squares = getLegalSquaresForPiece(game, 57);
+        expect(squares.sort()).toEqual([40, 42].sort());
 
-        squares = getLegalSquaresForPiece(knightOnC6, 18);
-        expect(squares).toEqual([1, 3, 8, 12, 24, 28, 33, 35]);
+        game.board[16] = PieceCode.WhiteKnight;
+        squares = getLegalSquaresForPiece(game, 16);
+        expect(squares.sort()).toEqual([1, 10, 26, 33].sort());
     });
-    */
 
     test('Bishop Moves', () => {
         let game = startingPosition;
@@ -42,6 +42,30 @@ describe('Test Piece Moves', () => {
         game.board[16] = PieceCode.WhiteQueen;
         squares = getLegalSquaresForPiece(game, 16);
         expect(squares.sort()).toEqual([8,17,18,19,20,21,22,23,24,32,40, 9, 25, 34, 43].sort());
+    });
+
+    test('Pawn Moves', () => {
+        let game = startingPosition;
+        let squares = getLegalSquaresForPiece(game, 51);
+        expect(squares.sort()).toEqual([43, 35].sort());
+
+        game = e4e5;
+        squares = getLegalSquaresForPiece(game, 36);
+        expect(squares.length).toBe(0);
+        
+        game = scandinavian;
+        squares = getLegalSquaresForPiece(game, 36);
+        expect(squares.sort()).toEqual([27,28].sort());
+    });
+
+    test('King Moves', () => {
+        let game = startingPosition;
+        let squares = getLegalSquaresForPiece(game, 60);
+        expect(squares.length).toBe(0);
+
+        game.board[35] = PieceCode.WhiteKing;
+        squares = getLegalSquaresForPiece(game, 35);
+        expect(squares.sort()).toEqual([26, 27, 28, 36, 44, 43, 42, 34].sort());
     });
 
 });
