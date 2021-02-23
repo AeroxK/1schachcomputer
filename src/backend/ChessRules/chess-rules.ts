@@ -1,4 +1,4 @@
-import { ActiveColor, ChessGame, PieceCode } from "../../shared/types";
+import { ActiveColor, ChessGame, Move, PieceCode } from "../../shared/types";
 
 interface MovePatternFunction {
     (game: ChessGame, square: number): number[]
@@ -223,4 +223,13 @@ getLegalSquaresForPiece = (game, square) => {
         .reduce((allSquares, currSquares) => allSquares.concat(currSquares), []);
 }
 
-export { getLegalSquaresForPiece };
+function makeMove(move: Move, game: ChessGame): ChessGame {
+    game.board[move.to] = game.board[move.from];
+    game.board[move.from] = PieceCode.EmptySquare;
+    const blackMoved = game.active_color < 0;
+    game.active_color = blackMoved ? ActiveColor.White : ActiveColor.Black;
+    game.fullmove_number = blackMoved ? game.fullmove_number + 1 : game.fullmove_number;
+    return game;
+}
+
+export { getLegalSquaresForPiece, makeMove };

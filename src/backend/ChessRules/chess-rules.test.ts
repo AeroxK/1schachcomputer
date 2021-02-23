@@ -2,10 +2,14 @@ import { PieceCode } from '../../shared/types';
 import { getLegalSquaresForPiece } from './chess-rules';
 import { startingPosition, scandinavian, e4e5 } from './samples/positions';
 
+describe('Test Make Move', () => {
+
+});
+
 describe('Test Piece Moves', () => {
 
     test('Rook Moves', () => {
-        let game = startingPosition;
+        let game = JSON.parse(JSON.stringify(startingPosition));
         let squares = getLegalSquaresForPiece(game, 56);
         expect(squares.length).toBe(0);
         
@@ -15,7 +19,7 @@ describe('Test Piece Moves', () => {
     });
 
     test('Knight Moves', () => {
-        let game = startingPosition;
+        let game = JSON.parse(JSON.stringify(startingPosition));
         let squares = getLegalSquaresForPiece(game, 57);
         expect(squares.sort()).toEqual([40, 42].sort());
 
@@ -25,7 +29,7 @@ describe('Test Piece Moves', () => {
     });
 
     test('Bishop Moves', () => {
-        let game = startingPosition;
+        let game = JSON.parse(JSON.stringify(startingPosition));
         let squares = getLegalSquaresForPiece(game, 58);
         expect(squares.length).toBe(0);
 
@@ -35,7 +39,7 @@ describe('Test Piece Moves', () => {
     });
 
     test('Queen Moves', () => {
-        let game = startingPosition;
+        let game = JSON.parse(JSON.stringify(startingPosition));
         let squares = getLegalSquaresForPiece(game, 59);
         expect(squares.length).toBe(0);
 
@@ -44,8 +48,18 @@ describe('Test Piece Moves', () => {
         expect(squares.sort()).toEqual([8,17,18,19,20,21,22,23,24,32,40, 9, 25, 34, 43].sort());
     });
 
+    test('King Moves', () => {
+        let game = JSON.parse(JSON.stringify(startingPosition));
+        let squares = getLegalSquaresForPiece(game, 60);
+        expect(squares.length).toBe(0);
+
+        game.board[35] = PieceCode.WhiteKing;
+        squares = getLegalSquaresForPiece(game, 35);
+        expect(squares.sort()).toEqual([26, 27, 28, 36, 44, 43, 42, 34].sort());
+    });
+
     test('Pawn Moves', () => {
-        let game = startingPosition;
+        let game = JSON.parse(JSON.stringify(startingPosition));
         let squares = getLegalSquaresForPiece(game, 51);
         expect(squares.sort()).toEqual([43, 35].sort());
 
@@ -56,16 +70,6 @@ describe('Test Piece Moves', () => {
         game = scandinavian;
         squares = getLegalSquaresForPiece(game, 36);
         expect(squares.sort()).toEqual([27,28].sort());
-    });
-
-    test('King Moves', () => {
-        let game = startingPosition;
-        let squares = getLegalSquaresForPiece(game, 60);
-        expect(squares.length).toBe(0);
-
-        game.board[35] = PieceCode.WhiteKing;
-        squares = getLegalSquaresForPiece(game, 35);
-        expect(squares.sort()).toEqual([26, 27, 28, 36, 44, 43, 42, 34].sort());
     });
 
 });

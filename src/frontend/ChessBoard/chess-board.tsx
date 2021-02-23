@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { GAME_API_URL, MOVE_API_URL } from '../../shared/config';
-import { Board, PieceCode } from '../../shared/types';
+import { Board, Move, PieceCode } from '../../shared/types';
 
 import './chess-board.css';
 
 type ChessBoardState = {
     board: Board,
-    highlightedSquares: number[]
+    highlightedSquares: number[],
+    selectedSquare: number,
 }
 
 type PieceIconMap = {
@@ -32,7 +33,11 @@ const PieceIconMaps: PieceIconMap[] = [
 
 export default class ChessBoard extends React.Component<{}, ChessBoardState> {
 
-    state: ChessBoardState = { board: [], highlightedSquares: [] };
+    state: ChessBoardState = {
+      board: [],
+      highlightedSquares: [],
+      selectedSquare: -1
+    };
 
     getMoves(square: number) {
         fetch(`${MOVE_API_URL}?square=${square}`).then((res: Response) => res.json().then((data: number[]) => {
@@ -44,9 +49,25 @@ export default class ChessBoard extends React.Component<{}, ChessBoardState> {
 
     handleSquareClick(square: number) {
         if (this.state.highlightedSquares.includes(square)) {
-            // make Move
+            const move: Move = { from: this.state.selectedSquare, to: square }
+            fetch(MOVE_API_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(move)
+            }).then((res: Response) => res.json().then(data => {
+                this.setState({
+                    board: data,
+                    highlightedSquares: [],
+                    selectedSquare: -1
+                });
+            }));
         } else if (this.state.board[square] !== 0) {
             this.getMoves(square);
+            this.setState({
+                selectedSquare: square
+            });
         } else {
             this.setState({
                 highlightedSquares: []
