@@ -1,12 +1,13 @@
 import React from 'react';
 
-import { API_URL } from '../../shared/config';
+import { GAME_API_URL, MOVE_API_URL } from '../../shared/config';
 import { Board, PieceCode } from '../../shared/types';
 
 import './chess-board.css';
 
 type ChessBoardState = {
-    board: Board
+    board: Board,
+    highlightedSquares: number[]
 }
 
 type PieceIconMap = {
@@ -31,13 +32,33 @@ const PieceIconMaps: PieceIconMap[] = [
 
 export default class ChessBoard extends React.Component<{}, ChessBoardState> {
 
-    state: ChessBoardState = { board: [] };
+    state: ChessBoardState = { board: [], highlightedSquares: [] };
+
+    getMoves(square: number) {
+        fetch(`${MOVE_API_URL}?square=${square}`).then((res: Response) => res.json().then((data: number[]) => {
+            this.setState({
+                highlightedSquares: data
+            });
+        }));
+    }
+
+    handleSquareClick(square: number) {
+        if (this.state.highlightedSquares.includes(square)) {
+            // make Move
+        } else if (this.state.board[square] !== 0) {
+            this.getMoves(square);
+        } else {
+            this.setState({
+                highlightedSquares: []
+            });
+        }
+    }
 
     render() {
         const squares = this.state.board.map((pieceCode: PieceCode, i: number) => {
             const piece = PieceIconMaps.find(map => map.pieceCode === pieceCode);
             return (
-                <button className="square" key={i}>
+                <button onClick={this.handleSquareClick.bind(this, i)} className={`square${this.state.highlightedSquares.includes(i) ? ' square--highlighted' : ''}`} key={i}>
                     { piece && <img src={piece.url} /> }
                 </button>
             );
@@ -47,7 +68,7 @@ export default class ChessBoard extends React.Component<{}, ChessBoardState> {
     }
     
     componentDidMount() {
-        fetch(API_URL).then((res: Response) => res.json().then((data: Board) => {
+        fetch(GAME_API_URL).then((res: Response) => res.json().then((data: Board) => {
             this.setState({
                 board: data
             });
