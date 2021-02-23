@@ -19,6 +19,10 @@ enum Distance {
     Vertical = 8
 }
 
+function offset(direction: Direction2D):number {
+    return direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical;
+}
+
 function isFriendlyPieceOn(square: number, game: ChessGame):boolean {
     const pieceCode: PieceCode = game.board[square];
     return pieceCode !== 0 && pieceCode > 0 === game.active_color > 0;
@@ -161,7 +165,7 @@ pawnMoves = (game, square) => {
     squares = squares.concat(captureDirections
         .filter(direction => !isEdgeInDirection(square, direction))
         .map(direction => square + direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical)
-        .filter(capture_square => isWhite ? game.board[capture_square] < 0 : game.board[capture_square] > 0));
+        .filter(capture_square => capture_square === game.en_passant_square || (isWhite ? game.board[capture_square] < 0 : game.board[capture_square] > 0)));
 
     return squares;
 }
@@ -255,14 +259,20 @@ function manageActiveColor(game: ChessGame, blackMoved: boolean):ChessGame {
 
 function manageEnPassant(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
     const pawnPieceCode: PieceCode = blackMoved ? PieceCode.BlackPawn : PieceCode.WhitePawn;
-    let direction: Direction2D = { horizontal_direction: 0, vertical_direction: blackMoved ? 2 : -2 };
-    const offset: number = direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical;
+    let direction: Direction2D = { horizontal_direction: 0, vertical_direction: blackMoved ? -1 : 1 };
+
+    if (move.to === game.en_passant_square && game.board[move.from] === pawnPieceCode) {
+        game.board[move.to + offset(direction)] = PieceCode.EmptySquare;
+    }
+
+    direction = { horizontal_direction: 0, vertical_direction: blackMoved ? 2 : -2 };
+
     if (
         game.board[move.from] === pawnPieceCode &&
-        move.to - move.from === offset
+        move.to - move.from === offset(direction)
         ) {
         direction.vertical_direction = blackMoved ? 1 : -1;
-        game.en_passant_square = move.from + direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical;
+        game.en_passant_square = move.from + offset(direction);
     } else {
         game.en_passant_square = -1;
     }
