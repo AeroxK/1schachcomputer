@@ -19,25 +19,17 @@ enum Distance {
     Vertical = 8
 }
 
-function isInBounds(square: number) {
-    return square >= 0 && square < 64;
-}
-
 function isFriendlyPieceOn(square: number, game: ChessGame):boolean {
     const pieceCode: PieceCode = game.board[square];
     return pieceCode !== 0 && pieceCode > 0 === game.active_color > 0;
-}
-
-function isEdgeAt(square: number):boolean {
-    return (square % 8 === 0) || (square % 8 === 7) || (square > 0 && square < 7) || (square > 56 && square < 63);
 }
 
 function isEdgeInDirection(square: number, direction: Direction2D) {
     return (
         direction.horizontal_direction < 0 && (square % 8 === 0) ||
         direction.horizontal_direction > 0 && (square % 8 === 7) ||
-        direction.vertical_direction < 0 && (square > 0 && square < 7) ||
-        direction.vertical_direction > 0 && (square > 56 && square < 63)
+        direction.vertical_direction < 0 && (square >= 0 && square <= 7) ||
+        direction.vertical_direction > 0 && (square >= 56 && square <= 63)
     );
 }
 
@@ -48,7 +40,7 @@ function findSquaresInDirection(game: ChessGame, square: number, direction: Dire
     let pieceCaptured = false;
     let onEdge = false;
 
-    while (isInBounds(next_square) && !(isFriendlyPieceOn(next_square, game) || pieceCaptured || onEdge || maxSteps === 0)) {
+    while (!(isFriendlyPieceOn(next_square, game) || pieceCaptured || onEdge || maxSteps === 0)) {
         squares.push(next_square);
         pieceCaptured = game.board[next_square] !== 0;
         onEdge = isEdgeInDirection(next_square, direction);
@@ -122,7 +114,7 @@ knightMoves = (game, square) => {
             return !isEdgeInDirection(square + offset, direction);
         })
         .map(direction => square + direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical)
-        .filter(square => !isFriendlyPieceOn(square, game) && isInBounds(square));
+        .filter(square => !isFriendlyPieceOn(square, game));
 }
 
 kingMoves = (game, square) => {
@@ -160,12 +152,14 @@ pawnMoves = (game, square) => {
     let front_square = square + moveDirection.vertical_direction * Distance.Vertical;
     if (game.board[front_square] === 0) {
         squares.push(front_square);
-    }
-    front_square = front_square + moveDirection.vertical_direction * Distance.Vertical;
-    if (game.board[front_square] === 0 && ((isWhite && square > 47 && square < 56) || (!isWhite && square > 7 && square < 16))) {
-        squares.push(front_square);
+
+        front_square = front_square + moveDirection.vertical_direction * Distance.Vertical;
+        if (game.board[front_square] === 0 && ((isWhite && square > 47 && square < 56) || (!isWhite && square > 7 && square < 16))) {
+            squares.push(front_square);
+        }
     }
     squares = squares.concat(captureDirections
+        .filter(direction => !isEdgeInDirection(square, direction))
         .map(direction => square + direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical)
         .filter(capture_square => isWhite ? game.board[capture_square] < 0 : game.board[capture_square] > 0));
 
@@ -223,12 +217,71 @@ getLegalSquaresForPiece = (game, square) => {
         .reduce((allSquares, currSquares) => allSquares.concat(currSquares), []);
 }
 
-function makeMove(move: Move, game: ChessGame): ChessGame {
+function manageCastlingAvailability(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
+    const kingPieceCode = blackMoved ? PieceCode.BlackKing : PieceCode.WhiteKing;
+    const castling = blackMoved ? game.castling_availability.black : game.castling_availability.white;
+    const queensideRookSquare = blackMoved ? 0 : 56;
+    const kingsideRookSquare = blackMoved ? 7 : 63;
+    if ((castling.kingside || castling.queenside) && game.board[move.from] === kingPieceCode) {
+        castling.kingside = false;
+        castling.queenside = false;
+    } else if (castling.queenside && move.from === queensideRookSquare) {
+        castling.queenside = false;
+    } else if (castling.kingside && move.from === kingsideRookSquare) {
+        castling.kingside = false;
+    }
+    return game;
+}
+
+function manageHalfmoveClock(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
+    const pawnPieceCode: PieceCode = blackMoved ? PieceCode.BlackPawn : PieceCode.WhitePawn;
+    if (game.board[move.from] === pawnPieceCode || game.board[move.to] !== 0) {
+        game.halfmove_clock = 0;
+    } else {
+        game.halfmove_clock = game.halfmove_clock + 1;
+    }
+    return game;
+}
+
+function manageFullmoveNumber(game: ChessGame, blackMoved: boolean):ChessGame {
+    game.fullmove_number = blackMoved ? game.fullmove_number + 1 : game.fullmove_number;
+    return game;
+}
+
+function manageActiveColor(game: ChessGame, blackMoved: boolean):ChessGame {
+    game.active_color = blackMoved ? ActiveColor.White : ActiveColor.Black;
+    return game;
+}
+
+function manageEnPassant(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
+    const pawnPieceCode: PieceCode = blackMoved ? PieceCode.BlackPawn : PieceCode.WhitePawn;
+    let direction: Direction2D = { horizontal_direction: 0, vertical_direction: blackMoved ? 2 : -2 };
+    const offset: number = direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical;
+    if (
+        game.board[move.from] === pawnPieceCode &&
+        move.to - move.from === offset
+        ) {
+        direction.vertical_direction = blackMoved ? 1 : -1;
+        game.en_passant_square = move.from + direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical;
+    } else {
+        game.en_passant_square = -1;
+    }
+    return game;
+}
+
+function makeMove(move: Move, game: ChessGame):ChessGame {
+
+    const blackMoved = game.active_color < 0;
+
+    game = manageCastlingAvailability(move, game, blackMoved);
+    game = manageHalfmoveClock(move, game, blackMoved);
+    game = manageFullmoveNumber(game, blackMoved);
+    game = manageActiveColor(game, blackMoved);
+    game = manageEnPassant(move, game, blackMoved);
+
     game.board[move.to] = game.board[move.from];
     game.board[move.from] = PieceCode.EmptySquare;
-    const blackMoved = game.active_color < 0;
-    game.active_color = blackMoved ? ActiveColor.White : ActiveColor.Black;
-    game.fullmove_number = blackMoved ? game.fullmove_number + 1 : game.fullmove_number;
+
     return game;
 }
 
