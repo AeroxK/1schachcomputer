@@ -25,7 +25,6 @@ app.get(MOVE_API_URL, (req: Request, res: Response) => {
 });
 
 app.post(MOVE_API_URL, (req: Request, res: Response) => {
-    console.log(req.body);
     game = makeMove(req.body, game);
     res.send(game.board);
 });
