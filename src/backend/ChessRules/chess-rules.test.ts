@@ -1,6 +1,14 @@
 import { ActiveColor, Move, PieceCode } from '../../shared/types';
 import { getLegalSquaresForPiece, makeMove } from './chess-rules';
-import { startingPosition, scandinavian, e4e5, enPassant, enPassantExpired } from './samples/positions';
+import {
+    startingPosition,
+    scandinavian,
+    e4e5,
+    enPassant,
+    enPassantExpired,
+    castling,
+    castlingBlockedByEnemy
+} from './samples/positions';
 
 describe('Test Make Move', () => {
     test('Move Pieces', () => {
@@ -62,9 +70,15 @@ describe('Test Make Move', () => {
         expect(game.castling_availability.white.queenside).toBeFalsy();
         
         game = makeMove({ from: 7, to: 23 }, game);
-
+        
         expect(game.castling_availability.black.kingside).toBeFalsy();
         expect(game.castling_availability.black.queenside).toBeTruthy();
+
+        game = JSON.parse(JSON.stringify(castling));
+        game = makeMove({ from: 60, to: 62 }, game);
+
+        expect(game.board[63]).toBe(PieceCode.EmptySquare);
+        expect(game.board[61]).toBe(PieceCode.WhiteRook);
     });
 
 });
@@ -115,10 +129,19 @@ describe('Test Piece Moves', () => {
         let game = JSON.parse(JSON.stringify(startingPosition));
         let squares = getLegalSquaresForPiece(game, 60);
         expect(squares.length).toBe(0);
-
+        
         game.board[35] = PieceCode.WhiteKing;
+        game.castling_availability.white = { queenside: false, kingside: false };
         squares = getLegalSquaresForPiece(game, 35);
         expect(squares.sort()).toEqual([26, 27, 28, 36, 44, 43, 42, 34].sort());
+        
+        game = JSON.parse(JSON.stringify(castling));
+        squares = getLegalSquaresForPiece(game, 60);
+        expect(squares.sort()).toEqual([58, 59, 61, 62].sort());
+
+        game = JSON.parse(JSON.stringify(castlingBlockedByEnemy));
+        squares = getLegalSquaresForPiece(game, 60);
+        expect(squares.sort()).toEqual([59, 61, 62].sort());
     });
 
     test('Pawn Moves', () => {

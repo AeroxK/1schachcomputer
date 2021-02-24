@@ -1,4 +1,5 @@
 import { ActiveColor, ChessGame, Move, PieceCode } from "../../shared/types";
+import { enPassantExpired } from "./samples/positions";
 
 interface MovePatternFunction {
     (game: ChessGame, square: number): number[]
@@ -19,13 +20,21 @@ enum Distance {
     Vertical = 8
 }
 
+function isFriendlyPiece(pieceCode: PieceCode, game: ChessGame) {
+    return pieceCode !== 0 && pieceCode > 0 === game.active_color > 0;
+}
+
+function isEnemyPiece(pieceCode: PieceCode, game: ChessGame) {
+    return pieceCode !== 0 && pieceCode > 0 !== game.active_color > 0;
+}
+
 function offset(direction: Direction2D):number {
     return direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical;
 }
 
 function isFriendlyPieceOn(square: number, game: ChessGame):boolean {
     const pieceCode: PieceCode = game.board[square];
-    return pieceCode !== 0 && pieceCode > 0 === game.active_color > 0;
+    return isFriendlyPiece(pieceCode, game);
 }
 
 function isEdgeInDirection(square: number, direction: Direction2D) {
@@ -61,6 +70,7 @@ let knightMoves: MovePatternFunction;
 let kingMoves: MovePatternFunction;
 let pawnMoves: MovePatternFunction;
 let getLegalSquaresForPiece: MovePatternFunction;
+let getActiveColorIndependentSquares: MovePatternFunction;
 
 diagonalMoves = (game, square) => {
     const directions: Direction2D[] = [
@@ -139,6 +149,45 @@ kingMoves = (game, square) => {
         squares = squares.concat(findSquaresInDirection(game, square, direction, 1));
     });
 
+    const pieceCode = game.board[square];
+    const isWhite = pieceCode > 0;
+    const castling = isWhite ? game.castling_availability.white : game.castling_availability.black;
+    const enemyKing = isWhite ? PieceCode.BlackKing : PieceCode.WhiteKing;
+    const enemyPieceSquares = game.board
+        .map((pieceCode, square) => { return { pieceCode, square }; })
+        .filter(el => isEnemyPiece(el.pieceCode, game) && el.pieceCode !== enemyKing)
+        .map(el => el.square);
+
+    if (castling.queenside) {
+        const queensideSquares = findSquaresInDirection(game, square, { horizontal_direction: -1, vertical_direction: 0 });
+        if (queensideSquares.length === 3 &&
+            !queensideSquares
+                .map(square => square + 1)
+                .some(square => {
+                    return enemyPieceSquares.some(enemyPiece => {
+                        return getActiveColorIndependentSquares(game, enemyPiece).includes(square);
+                    });
+                }))
+        {
+            squares.push(square + offset({ horizontal_direction: -2, vertical_direction: 0 }));
+        }
+    }
+
+    if (castling.kingside) {
+        const kingsideSquares = findSquaresInDirection(game, square, { horizontal_direction: 1, vertical_direction: 0 });
+        if (kingsideSquares.length === 2 &&
+            !kingsideSquares
+                .concat([square])
+                .some(square => {
+                    return enemyPieceSquares.some(enemyPiece => {
+                        return getActiveColorIndependentSquares(game, enemyPiece).includes(square);
+                    });
+                }))
+        {
+            squares.push(square + offset({ horizontal_direction: 2, vertical_direction: 0 }));
+        }
+    }
+
     return squares;
 }
 
@@ -212,23 +261,37 @@ const movePatterns: PieceMovePatternMap[] = [
     }
 ]
 
-getLegalSquaresForPiece = (game, square) => {
+getActiveColorIndependentSquares = (game, square) => {
     const piece_code: PieceCode = game.board[square];
-    if (piece_code === 0 || !(game.active_color > 0 === piece_code > 0)) return [];
     return movePatterns
         .filter(pattern => pattern.piece_codes.includes(piece_code))
         .map(pattern => pattern.move_pattern_fn(game, square))
         .reduce((allSquares, currSquares) => allSquares.concat(currSquares), []);
 }
 
+getLegalSquaresForPiece = (game, square) => {
+    const piece_code: PieceCode = game.board[square];
+    if (isEnemyPiece(piece_code, game)) return [];
+    return getActiveColorIndependentSquares(game, square);
+}
+
 function manageCastlingAvailability(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
     const kingPieceCode = blackMoved ? PieceCode.BlackKing : PieceCode.WhiteKing;
+    const rookPieceCode = blackMoved ? PieceCode.BlackRook : PieceCode.WhiteRook;
     const castling = blackMoved ? game.castling_availability.black : game.castling_availability.white;
     const queensideRookSquare = blackMoved ? 0 : 56;
     const kingsideRookSquare = blackMoved ? 7 : 63;
     if ((castling.kingside || castling.queenside) && game.board[move.from] === kingPieceCode) {
         castling.kingside = false;
         castling.queenside = false;
+        if (move.from - move.to === 2) {
+            game.board[queensideRookSquare] = PieceCode.EmptySquare;
+            game.board[move.to + 1] = rookPieceCode;
+        }
+        if (move.from - move.to === -2) {
+            game.board[kingsideRookSquare] = PieceCode.EmptySquare;
+            game.board[move.to - 1] = rookPieceCode;
+        }
     } else if (castling.queenside && move.from === queensideRookSquare) {
         castling.queenside = false;
     } else if (castling.kingside && move.from === kingsideRookSquare) {
