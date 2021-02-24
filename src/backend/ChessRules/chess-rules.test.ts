@@ -7,7 +7,9 @@ import {
     enPassant,
     enPassantExpired,
     castling,
-    castlingBlockedByEnemy
+    castlingBlockedByEnemy,
+    nimzoIndian,
+    bogoIndian
 } from './samples/positions';
 
 describe('Test Make Move', () => {
@@ -85,6 +87,26 @@ describe('Test Make Move', () => {
 
 describe('Test Piece Moves', () => {
 
+    test('Checks & Absolute Pins', () => {
+        let game = JSON.parse(JSON.stringify(nimzoIndian));
+        let squares = getLegalSquaresForPiece(game, 42);
+        
+        expect(squares.length).toBe(0);
+        
+        game = JSON.parse(JSON.stringify(bogoIndian));
+        squares = getLegalSquaresForPiece(game, 60);
+
+        expect(squares.length).toBe(0);
+
+        squares = getLegalSquaresForPiece(game, 59);
+
+        expect(squares.sort()).toEqual([51].sort());
+
+        squares = getLegalSquaresForPiece(game, 57);
+
+        expect(squares.sort()).toEqual([42, 51].sort());
+    });
+
     test('Rook Moves', () => {
         let game = JSON.parse(JSON.stringify(startingPosition));
         let squares = getLegalSquaresForPiece(game, 56);
@@ -141,7 +163,7 @@ describe('Test Piece Moves', () => {
 
         game = JSON.parse(JSON.stringify(castlingBlockedByEnemy));
         squares = getLegalSquaresForPiece(game, 60);
-        expect(squares.sort()).toEqual([59, 61, 62].sort());
+        expect(squares.sort()).toEqual([61, 62].sort());
     });
 
     test('Pawn Moves', () => {

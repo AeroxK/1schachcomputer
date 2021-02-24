@@ -20,21 +20,22 @@ enum Distance {
     Vertical = 8
 }
 
-function isFriendlyPiece(pieceCode: PieceCode, game: ChessGame) {
-    return pieceCode !== 0 && pieceCode > 0 === game.active_color > 0;
+function isFriendlyPiece(my_square: number, other_square: number, game: ChessGame):boolean {
+    const my_piece_code = game.board[my_square];
+    const other_piece_code = game.board[other_square];
+
+    return other_piece_code !== 0 && other_piece_code > 0 === my_piece_code > 0;
 }
 
-function isEnemyPiece(pieceCode: PieceCode, game: ChessGame) {
-    return pieceCode !== 0 && pieceCode > 0 !== game.active_color > 0;
+function isEnemyPiece(my_square: number, other_square: number, game: ChessGame):boolean {
+    const my_piece_code = game.board[my_square];
+    const other_piece_code = game.board[other_square];
+
+    return other_piece_code !== 0 && other_piece_code > 0 !== my_piece_code > 0;
 }
 
 function offset(direction: Direction2D):number {
     return direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical;
-}
-
-function isFriendlyPieceOn(square: number, game: ChessGame):boolean {
-    const pieceCode: PieceCode = game.board[square];
-    return isFriendlyPiece(pieceCode, game);
 }
 
 function isEdgeInDirection(square: number, direction: Direction2D) {
@@ -53,7 +54,7 @@ function findSquaresInDirection(game: ChessGame, square: number, direction: Dire
     let pieceCaptured = false;
     let onEdge = false;
 
-    while (!(isFriendlyPieceOn(next_square, game) || pieceCaptured || onEdge || maxSteps === 0)) {
+    while (!(isFriendlyPiece(square, next_square, game) || pieceCaptured || onEdge || maxSteps === 0)) {
         squares.push(next_square);
         pieceCaptured = game.board[next_square] !== 0;
         onEdge = isEdgeInDirection(next_square, direction);
@@ -128,7 +129,7 @@ knightMoves = (game, square) => {
             return !isEdgeInDirection(square + offset, direction);
         })
         .map(direction => square + direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical)
-        .filter(square => !isFriendlyPieceOn(square, game));
+        .filter(next_square => !isFriendlyPiece(square, next_square, game));
 }
 
 kingMoves = (game, square) => {
@@ -155,7 +156,7 @@ kingMoves = (game, square) => {
     const enemyKing = isWhite ? PieceCode.BlackKing : PieceCode.WhiteKing;
     const enemyPieceSquares = game.board
         .map((pieceCode, square) => { return { pieceCode, square }; })
-        .filter(el => isEnemyPiece(el.pieceCode, game) && el.pieceCode !== enemyKing)
+        .filter(el => isEnemyPiece(square, el.square, game) && el.pieceCode !== enemyKing)
         .map(el => el.square);
 
     if (castling.queenside) {
@@ -269,10 +270,30 @@ getActiveColorIndependentSquares = (game, square) => {
         .reduce((allSquares, currSquares) => allSquares.concat(currSquares), []);
 }
 
+function isActiveKingInCheck(game: ChessGame):boolean {
+    const kingPieceCode = game.active_color > 0 ? PieceCode.WhiteKing : PieceCode.BlackKing;
+    const kingPosition = game.board.indexOf(kingPieceCode);
+    const enemyPieceSquares = game.board
+        .map((pieceCode, square) => { return { pieceCode, square }; })
+        .filter(el => isEnemyPiece(kingPosition, el.square, game))
+        .map(el => el.square);
+    
+    return enemyPieceSquares.some(enemyPiece => {
+        return getActiveColorIndependentSquares(game, enemyPiece).includes(kingPosition)
+    });
+}
+
 getLegalSquaresForPiece = (game, square) => {
     const piece_code: PieceCode = game.board[square];
-    if (isEnemyPiece(piece_code, game)) return [];
-    return getActiveColorIndependentSquares(game, square);
+    if (piece_code === 0 || piece_code > 0 !== game.active_color > 0) return [];
+    const next_squares = getActiveColorIndependentSquares(game, square);
+
+    return next_squares.filter(next_square => {
+        const game_clone = JSON.parse(JSON.stringify(game));
+        game_clone.board[next_square] = game_clone.board[square];
+        game_clone.board[square] = PieceCode.EmptySquare;
+        return !isActiveKingInCheck(game_clone);
+    });
 }
 
 function manageCastlingAvailability(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
