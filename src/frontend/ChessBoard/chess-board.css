@@ -19,6 +19,7 @@
     height: 100%;
 
     border: 1px solid var(--dark-square-bg-color);
+    box-sizing: border-box;
 }
 
 .square {
