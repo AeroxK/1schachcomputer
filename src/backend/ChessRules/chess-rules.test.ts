@@ -10,7 +10,8 @@ import {
     castlingBlockedByEnemy,
     nimzoIndian,
     bogoIndian,
-    captureRook
+    captureRook,
+    promotion
 } from './samples/positions';
 
 describe('Test Make Move', () => {
@@ -89,6 +90,22 @@ describe('Test Make Move', () => {
         expect(game.castling_availability.white.kingside).toBeFalsy();
     });
 
+    test('Manage Promotions', () => {
+        let game = JSON.parse(JSON.stringify(promotion));
+        game = makeMove({ from: 9, to: 261 }, game);
+
+        expect(game.board[1]).toBe(PieceCode.WhiteQueen);
+
+        game = JSON.parse(JSON.stringify(promotion));
+        game = makeMove({ from: 9, to: 117 }, game);
+
+        expect(game.board[0]).toBe(PieceCode.WhiteKnight);
+
+        game = JSON.parse(JSON.stringify(promotion));
+        game = makeMove({ from: 9, to: 306 }, game);
+
+        expect(game.board[2]).toBe(PieceCode.WhiteBishop);
+    });
 });
 
 describe('Test Piece Moves', () => {
@@ -200,6 +217,11 @@ describe('Test Piece Moves', () => {
         game = JSON.parse(JSON.stringify(enPassantExpired));
         squares = getLegalSquaresForPiece(game, 28);
         expect(squares.sort()).toEqual([20].sort());
+
+        game = JSON.parse(JSON.stringify(promotion));
+        squares = getLegalSquaresForPiece(game, 9);
+
+        expect(squares.sort()).toEqual([117, 126, 171, 135, 207, 216, 261, 225, 297, 306, 351, 315].sort());
     });
 
 });

@@ -1,5 +1,5 @@
 import { ActiveColor, ChessGame, Move, PieceCode } from "../../shared/types";
-import { enPassantExpired } from "./samples/positions";
+import { promotion } from "./samples/positions";
 
 interface MovePatternFunction {
     (game: ChessGame, square: number): number[]
@@ -217,7 +217,18 @@ pawnMoves = (game, square) => {
         .map(direction => square + direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical)
         .filter(capture_square => capture_square === game.en_passant_square || (isWhite ? game.board[capture_square] < 0 : game.board[capture_square] > 0)));
 
-    return squares;
+    const isPromotion = (isWhite && square > 7 && square < 16) || (!isWhite && square > 47 && square < 56);
+    if (isPromotion) {
+        return squares.map((promotionSquare, i) => {
+            const promotionPieceCodes: PieceCode[] = isWhite ? 
+                [PieceCode.WhiteKnight, PieceCode.WhiteBishop, PieceCode.WhiteRook, PieceCode.WhiteQueen] :
+                [PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackRook, PieceCode.BlackQueen];
+            const pieceCodeOffset = isWhite ? 10 : -10;
+            return promotionPieceCodes.map(promoCode => (promoCode + pieceCodeOffset * (i + 1)) * square);
+        }).reduce((allPromoCodes, promoCodeArr) => allPromoCodes.concat(promoCodeArr), []);
+    } else {
+        return squares;
+    }
 }
 
 const movePatterns: PieceMovePatternMap[] = [
@@ -370,18 +381,39 @@ function manageEnPassant(move: Move, game: ChessGame, blackMoved: boolean):Chess
     return game;
 }
 
-function makeMove(move: Move, game: ChessGame):ChessGame {
+function managePromotions(move: Move, game: ChessGame): ChessGame {
+    let directionToLeftMostPromotionSquare: Direction2D = 
+        { horizontal_direction: -2, vertical_direction: game.active_color > 0 ? -1 : 1 };
+    let pieceCodePlusOffset = move.to / move.from;
+    let promotionSquare = move.from + offset(directionToLeftMostPromotionSquare);
+    let squareEncodingOffset = game.active_color * 10;
 
-    const blackMoved = game.active_color < 0;
+    while (pieceCodePlusOffset > 10 || pieceCodePlusOffset < -10) {
+        promotionSquare = promotionSquare + 1 * Distance.Horizontal;
+        pieceCodePlusOffset = pieceCodePlusOffset - squareEncodingOffset;
+    }
 
-    game = manageCastlingAvailability(move, game, blackMoved);
-    game = manageHalfmoveClock(move, game, blackMoved);
-    game = manageFullmoveNumber(game, blackMoved);
-    game = manageActiveColor(game, blackMoved);
-    game = manageEnPassant(move, game, blackMoved);
-
-    game.board[move.to] = game.board[move.from];
+    game.board[promotionSquare] = pieceCodePlusOffset;
     game.board[move.from] = PieceCode.EmptySquare;
+
+    return game;
+}
+
+function makeMove(move: Move, game: ChessGame):ChessGame {
+    if (move.to > 63 || move.to < 0) {
+        game = managePromotions(move, game);
+    } else {
+        const blackMoved = game.active_color < 0;
+    
+        game = manageCastlingAvailability(move, game, blackMoved);
+        game = manageHalfmoveClock(move, game, blackMoved);
+        game = manageFullmoveNumber(game, blackMoved);
+        game = manageActiveColor(game, blackMoved);
+        game = manageEnPassant(move, game, blackMoved);
+    
+        game.board[move.to] = game.board[move.from];
+        game.board[move.from] = PieceCode.EmptySquare;
+    }
 
     return game;
 }
