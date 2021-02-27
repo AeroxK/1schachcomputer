@@ -44,10 +44,12 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
 
         this.state = {
             board: [],
-            flipped: this.props.flipped,
+            flipped: this.props.flipped || false,
             highlightedSquares: [],
             selectedSquare: -1
         };
+
+        this.handleFlipBoardClick = this.handleFlipBoardClick.bind(this);
     }
 
     getMoves(square: number) {
@@ -110,7 +112,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                     <div className="board">{ squares }</div>
                 </div>
                 <div className="toolbar">
-                    <IconButton aria-label="Flip board" onClick={this.handleFlipBoardClick.bind(this)}>
+                    <IconButton aria-label="Flip board" onClick={this.handleFlipBoardClick}>
                         <FlipCameraAndroidIcon />
                     </IconButton>
                 </div>
