@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import '@fontsource/roboto';
 
-import ChessBoard from './ChessBoard/chess-board';
+import ChessGui from './ChessGui/chess-gui';
 
 import './style.css';
 
-ReactDOM.render(<ChessBoard />, document.getElementById('chess-gui'));
+ReactDOM.render(<ChessGui />, document.getElementById('chess-gui'));
