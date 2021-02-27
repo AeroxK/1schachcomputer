@@ -51,7 +51,7 @@ $component: '.m-chess-board';
             background-color: var(--dark-square-bg-color);
         }
 
-        &#{$component}__square--highlighted::before {
+        &#{$component}__square--highlighted::after {
             display: block;
             content: '';
             width: 50%;

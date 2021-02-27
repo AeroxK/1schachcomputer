@@ -1,5 +1,6 @@
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
 
 import { GAME_API_URL, MOVE_API_URL } from '../../shared/config';
@@ -127,9 +128,11 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                     <div className={`${this.COMPONENT_CSS_CLASS}__board`}>{ squares }</div>
                 </div>
                 <div className={`${this.COMPONENT_CSS_CLASS}__toolbar`}>
-                    <IconButton aria-label="Flip board" onClick={this.handleFlipBoardClick}>
-                        <FlipCameraAndroidIcon />
-                    </IconButton>
+                    <Tooltip title="Flip board">
+                        <IconButton aria-label="Flip board" onClick={this.handleFlipBoardClick}>
+                            <FlipCameraAndroidIcon />
+                        </IconButton>
+                    </Tooltip>
                 </div>
             </div>
         );
