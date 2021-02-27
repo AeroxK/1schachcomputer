@@ -92,17 +92,17 @@ describe('Test Make Move', () => {
 
     test('Manage Promotions', () => {
         let game = JSON.parse(JSON.stringify(promotion));
-        game = makeMove({ from: 9, to: 261 }, game);
+        game = makeMove({ from: 9, to: 80 }, game);
 
         expect(game.board[1]).toBe(PieceCode.WhiteQueen);
 
         game = JSON.parse(JSON.stringify(promotion));
-        game = makeMove({ from: 9, to: 117 }, game);
+        game = makeMove({ from: 9, to: 64 }, game);
 
         expect(game.board[0]).toBe(PieceCode.WhiteKnight);
 
         game = JSON.parse(JSON.stringify(promotion));
-        game = makeMove({ from: 9, to: 306 }, game);
+        game = makeMove({ from: 9, to: 85 }, game);
 
         expect(game.board[2]).toBe(PieceCode.WhiteBishop);
     });
@@ -221,14 +221,14 @@ describe('Test Piece Moves', () => {
         game = JSON.parse(JSON.stringify(promotion));
         squares = getLegalSquaresForPiece(game, 9);
 
-        expect(squares.sort()).toEqual([117, 126, 171, 135, 207, 216, 261, 225, 297, 306, 351, 315].sort());
+        expect(squares.sort()).toEqual([64, 65, 66, 70, 74, 75, 76, 80, 84, 85, 86, 90].sort());
         
         game.board[49] = PieceCode.BlackPawn;
         game.board[57] = PieceCode.EmptySquare;
         game.active_color = ActiveColor.Black;
         squares = getLegalSquaresForPiece(game, 49);
 
-        expect(squares.sort()).toEqual([-637, -1127, -1617, -686, -1176, -1666, -735, -1225, -1715, -931, -1421, -1911].sort());
+        expect(squares.sort()).toEqual([-64, -65, -66, -70, -74, -75, -76, -80, -84, -85, -86, -90].sort());
     });
 
 });

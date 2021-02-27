@@ -70,9 +70,9 @@ const move: Move = { from: 01, to: 18 };
 
 ### Promotions
 
-Promotion moves will have a special value, encoding both the target square and the piece to promote to, given as the "to" property of the move object.
+Promotion moves will be unique, encoding both the target square and the piece to promote to into the "to" property of the move object. The value of the to property of promotion moves will always be either smaller than -63 or bigger than 63.
 
-The target square for a given pawn square will be represented by a fixed number, depending on which of the three possible promotion squares (push, capture left, capture right) should be targeted. For a know pawn location this would yield:
+The target square for any promotion move will be represented by a fixed number relative to the origin square, depending on which of the three possible promotion squares (push, capture left, capture right) should be targeted. For any promotion move this will yield:
 
 Example:
 
@@ -80,13 +80,19 @@ Example:
 - 20 for the left most promotion square (-20 for black promotions)
 - 30 for the left most promotion square (-30 for black promotions)
 
+At the end, another fixed offset will be added to the promotion square offset, making sure the value of the "to" property is pushed outside of the range from -63 to 63. For white promotions this value is 51, for black promotions it is -51.
+
+Example Promotion Encoding:
+
 ```typescript
 const pawnSquare: number = 9; // b7
 const pieceToPromoteTo: PieceCode = 9; // White queen
-const targetSquareOffset = 10; //a8
+const promotionSquareOffset = 10; //a8
 
 const promotionMove = {
     from: pawnSquare,
-    to: (pieceToPromoteTo + targetSquare) * pawnSquare
+    to: pieceToPromoteTo + promotionSquareOffset + 51
 }
 ```
+
+This explanation is intended mainly to improve understanding of the application, there are util functions covering both encoding and decoding the promotion moves.
