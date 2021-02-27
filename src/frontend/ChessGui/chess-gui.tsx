@@ -3,7 +3,7 @@ import Typography from '@material-ui/core/Typography';
 
 import ChessBoard from '../ChessBoard/chess-board';
 
-import './chess-gui.css';
+import './chess-gui.scss';
 
 export default class ChessGui extends React.Component {
     render() {

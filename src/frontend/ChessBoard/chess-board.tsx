@@ -5,7 +5,7 @@ import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
 import { GAME_API_URL, MOVE_API_URL } from '../../shared/config';
 import { Board, Move, PieceCode } from '../../shared/types';
 
-import './chess-board.css';
+import './chess-board.scss';
 
 type ChessBoardProps = {
     flipped?: boolean
