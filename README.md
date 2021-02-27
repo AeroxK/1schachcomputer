@@ -74,11 +74,9 @@ Promotion moves will be unique, encoding both the target square and the piece to
 
 The target square for any promotion move will be represented by a fixed number relative to the origin square, depending on which of the three possible promotion squares (push, capture left, capture right) should be targeted. For any promotion move this will yield:
 
-Example:
-
 - 10 for the left most promotion square (-10 for black promotions)
-- 20 for the left most promotion square (-20 for black promotions)
-- 30 for the left most promotion square (-30 for black promotions)
+- 20 for the middle promotion square (-20 for black promotions)
+- 30 for the right most promotion square (-30 for black promotions)
 
 At the end, another fixed offset will be added to the promotion square offset, making sure the value of the "to" property is pushed outside of the range from -63 to 63. For white promotions this value is 51, for black promotions it is -51.
 
