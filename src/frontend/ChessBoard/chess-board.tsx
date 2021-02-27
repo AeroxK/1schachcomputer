@@ -39,6 +39,8 @@ const PieceIconMaps: PieceIconMap[] = [
 ];
 
 export default class ChessBoard extends React.Component<ChessBoardProps, ChessBoardState> {
+    COMPONENT_CSS_CLASS: string;
+    
     constructor(props: ChessBoardProps) {
         super(props);
 
@@ -49,6 +51,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             selectedSquare: -1
         };
 
+        this.COMPONENT_CSS_CLASS = 'm-chess-board'
         this.handleFlipBoardClick = this.handleFlipBoardClick.bind(this);
     }
 
@@ -100,18 +103,30 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         const squares = this.state.board.map((pieceCode: PieceCode, i: number) => {
             const piece = PieceIconMaps.find(map => map.pieceCode === pieceCode);
             return (
-                <button onClick={this.handleSquareClick.bind(this, i)} className={`square${this.state.highlightedSquares.includes(i) ? ' square--highlighted' : ''}`} key={i}>
+                <button
+                    onClick={this.handleSquareClick.bind(this, i)}
+                    className={`
+                        ${this.COMPONENT_CSS_CLASS}__square
+                        ${this.state.highlightedSquares.includes(i) ?
+                            `${this.COMPONENT_CSS_CLASS}__square--highlighted` : ''
+                        }
+                    `}
+                    key={i}
+                >
                     { piece && <img src={piece.url} /> }
                 </button>
             );
         })
 
         return (
-            <div>
-                <div className={`board-wrapper${this.state.flipped ? ' state-flipped' : ''}`}>
-                    <div className="board">{ squares }</div>
+            <div className={`
+                ${this.COMPONENT_CSS_CLASS}
+                ${this.state.flipped ? ` ${this.COMPONENT_CSS_CLASS}--flipped` : ''}
+            `}>
+                <div className={`${this.COMPONENT_CSS_CLASS}__board-wrapper`}>
+                    <div className={`${this.COMPONENT_CSS_CLASS}__board`}>{ squares }</div>
                 </div>
-                <div className="toolbar">
+                <div className={`${this.COMPONENT_CSS_CLASS}__toolbar`}>
                     <IconButton aria-label="Flip board" onClick={this.handleFlipBoardClick}>
                         <FlipCameraAndroidIcon />
                     </IconButton>

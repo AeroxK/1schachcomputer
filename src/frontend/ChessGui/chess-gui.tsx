@@ -5,16 +5,26 @@ import ChessBoard from '../ChessBoard/chess-board';
 
 import './chess-gui.scss';
 
-export default class ChessGui extends React.Component {
+type ChessGuiProps = {};
+
+export default class ChessGui extends React.Component<ChessGuiProps, {}> {
+    COMPONENT_CSS_CLASS: string;
+
+    constructor(props: ChessGuiProps) {
+        super(props);
+
+        this.COMPONENT_CSS_CLASS = 'o-chess-gui';
+    }
+
     render() {
         return (
-            <div className="chess-gui">
-                <div className="headline">
+            <div className={`${this.COMPONENT_CSS_CLASS}`}>
+                <div className={`${this.COMPONENT_CSS_CLASS}__headline`}>
                     <Typography variant="h5" component="h1" gutterBottom>
                         1schachcomputer
                     </Typography>
                 </div>
-                <div className="container">
+                <div className={`${this.COMPONENT_CSS_CLASS}__board`}>
                     <ChessBoard />
                 </div>
             </div>

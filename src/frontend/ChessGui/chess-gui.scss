@@ -1,8 +1,10 @@
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-}
+.o-chess-gui {
+    &__headline {
+        text-align: center;
+    }
 
-.headline {
-    text-align: center;
-}
+    &__board {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+} 
