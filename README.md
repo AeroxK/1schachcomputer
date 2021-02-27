@@ -45,6 +45,8 @@ Run all of the watchers combined:
 npm run dev
 ```
 
+### The Board
+
 The chess board is represented as an array of indices as follows:
 
 ```
@@ -56,4 +58,35 @@ The chess board is represented as an array of indices as follows:
 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 |  
 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 |  
 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 |
+```
+
+### Moves
+
+The Moves will be given as a tuple of indices in the range 0-63:
+
+```typescript
+const move: Move = { from: 01, to: 18 };
+```
+
+### Promotions
+
+Promotion moves will have a special value, encoding both the target square and the piece to promote to, given as the "to" property of the move object.
+
+The target square for a given pawn square will be represented by a fixed number, depending on which of the three possible promotion squares (push, capture left, capture right) should be targeted. For a know pawn location this would yield:
+
+Example:
+
+- 10 for the left most promotion square (-10 for black promotions)
+- 20 for the left most promotion square (-20 for black promotions)
+- 30 for the left most promotion square (-30 for black promotions)
+
+```typescript
+const pawnSquare: number = 9; // b7
+const pieceToPromoteTo: PieceCode = 9; // White queen
+const targetSquareOffset = 10; //a8
+
+const promotionMove = {
+    from: pawnSquare,
+    to: (pieceToPromoteTo + targetSquare) * pawnSquare
+}
 ```
