@@ -5,6 +5,14 @@
     position: relative;
 }
 
+.board-wrapper.state-flipped {
+    transform: rotate(180deg);
+}
+
+.board-wrapper.state-flipped .square img {
+    transform: rotate(180deg);
+}
+
 .board {
     --dark-square-bg-color: #5f4339;
     --light-square-bg-color: #be9c91;
@@ -26,13 +34,16 @@
     position: relative;
 
     border: none;
-    cursor: pointer;
     padding: 0;
 
     width: calc(100% / 8);
     height: calc(100% / 8);
 
     background: var(--light-square-bg-color);
+  }
+
+  .square:not(:empty), .square.square--highlighted {
+    cursor: pointer;
 }
 
 .square.square--highlighted::after {

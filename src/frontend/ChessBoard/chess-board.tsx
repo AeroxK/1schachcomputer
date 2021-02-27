@@ -1,12 +1,19 @@
 import React from 'react';
+import IconButton from '@material-ui/core/IconButton';
+import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
 
 import { GAME_API_URL, MOVE_API_URL } from '../../shared/config';
 import { Board, Move, PieceCode } from '../../shared/types';
 
 import './chess-board.css';
 
+type ChessBoardProps = {
+    flipped?: boolean
+}
+
 type ChessBoardState = {
     board: Board,
+    flipped: boolean,
     highlightedSquares: number[],
     selectedSquare: number,
 }
@@ -31,20 +38,32 @@ const PieceIconMaps: PieceIconMap[] = [
     { pieceCode: PieceCode.WhitePawn, url: require('./icons/white-pawn.svg') },
 ];
 
-export default class ChessBoard extends React.Component<{}, ChessBoardState> {
+export default class ChessBoard extends React.Component<ChessBoardProps, ChessBoardState> {
+    constructor(props: ChessBoardProps) {
+        super(props);
 
-    state: ChessBoardState = {
-      board: [],
-      highlightedSquares: [],
-      selectedSquare: -1
-    };
+        this.state = {
+            board: [],
+            flipped: this.props.flipped,
+            highlightedSquares: [],
+            selectedSquare: -1
+        };
+    }
 
     getMoves(square: number) {
         fetch(`${MOVE_API_URL}?square=${square}`).then((res: Response) => res.json().then((data: number[]) => {
-            this.setState({
-                highlightedSquares: data
-            });
+            if (data.length && (data[0] > 63 || data[0] < 0)) {
+              alert('Promotion!');
+            } else {
+              this.setState({
+                  highlightedSquares: data
+              });
+            }
         }));
+    }
+
+    handleFlipBoardClick() {
+        this.setState({ flipped: !this.state.flipped });
     }
 
     handleSquareClick(square: number) {
@@ -85,7 +104,18 @@ export default class ChessBoard extends React.Component<{}, ChessBoardState> {
             );
         })
 
-        return (<div className="board-wrapper"><div className="board">{ squares }</div></div>);
+        return (
+            <div>
+                <div className={`board-wrapper${this.state.flipped ? ' state-flipped' : ''}`}>
+                    <div className="board">{ squares }</div>
+                </div>
+                <div className="toolbar">
+                    <IconButton aria-label="Flip board" onClick={this.handleFlipBoardClick.bind(this)}>
+                        <FlipCameraAndroidIcon />
+                    </IconButton>
+                </div>
+            </div>
+        );
     }
     
     componentDidMount() {
