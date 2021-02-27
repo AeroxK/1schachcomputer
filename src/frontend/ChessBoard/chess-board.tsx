@@ -5,6 +5,8 @@ import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
 import { GAME_API_URL, MOVE_API_URL } from '../../shared/config';
 import { Board, Move, PieceCode } from '../../shared/types';
 
+import { concatClasses } from '../shared/util';
+
 import './chess-board.scss';
 
 type ChessBoardProps = {
@@ -105,12 +107,10 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             return (
                 <button
                     onClick={this.handleSquareClick.bind(this, i)}
-                    className={`
-                        ${this.COMPONENT_CSS_CLASS}__square
-                        ${this.state.highlightedSquares.includes(i) ?
-                            `${this.COMPONENT_CSS_CLASS}__square--highlighted` : ''
-                        }
-                    `}
+                    className={concatClasses([
+                        `${this.COMPONENT_CSS_CLASS}__square`,
+                        this.state.highlightedSquares.includes(i) ? `${this.COMPONENT_CSS_CLASS}__square--highlighted` : ''
+                    ])}
                     key={i}
                 >
                     { piece && <img src={piece.url} /> }
@@ -119,10 +119,10 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         })
 
         return (
-            <div className={`
-                ${this.COMPONENT_CSS_CLASS}
-                ${this.state.flipped ? ` ${this.COMPONENT_CSS_CLASS}--flipped` : ''}
-            `}>
+            <div className={concatClasses([
+                `${this.COMPONENT_CSS_CLASS}`,
+                this.state.flipped ? ` ${this.COMPONENT_CSS_CLASS}--flipped` : ''
+            ])}>
                 <div className={`${this.COMPONENT_CSS_CLASS}__board-wrapper`}>
                     <div className={`${this.COMPONENT_CSS_CLASS}__board`}>{ squares }</div>
                 </div>
