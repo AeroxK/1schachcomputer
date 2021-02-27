@@ -47,8 +47,8 @@ export interface Move {
 }
 
 export interface Promotion {
+    move: Move,
     promote_to: PieceCode,
-    square: number
 }
 
 export type Direction = -2 | -1 | 0 | 1 | 2;

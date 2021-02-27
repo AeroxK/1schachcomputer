@@ -1,10 +1,13 @@
 import React from 'react';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
 
 import { GAME_API_URL, MOVE_API_URL } from '../../shared/config';
-import { Board, Move, PieceCode } from '../../shared/types';
+import { Board, Move, PieceCode, Promotion } from '../../shared/types';
+import { decodePromotions, encodePromotions } from '../../shared/util';
 
 import { concatClasses } from '../shared/util';
 
@@ -18,6 +21,8 @@ type ChessBoardState = {
     board: Board,
     flipped: boolean,
     highlightedSquares: number[],
+    promotions: Promotion[],
+    selectedPromotionSquare: number,
     selectedSquare: number,
 }
 
@@ -51,45 +56,60 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             board: [],
             flipped: this.props.flipped || false,
             highlightedSquares: [],
-            selectedSquare: -1
+            promotions: [],
+            selectedSquare: -1,
+            selectedPromotionSquare: -1,
         };
 
         this.COMPONENT_CSS_CLASS = 'm-chess-board'
         this.handleFlipBoardClick = this.handleFlipBoardClick.bind(this);
+        this.handlePromotionDialogClose = this.handlePromotionDialogClose.bind(this);
     }
 
     getMoves(square: number) {
         fetch(`${MOVE_API_URL}?square=${square}`).then((res: Response) => res.json().then((data: number[]) => {
             if (data.length && (data[0] > 63 || data[0] < 0)) {
-              alert('Promotion!');
+                const promotionMoves = data.map(to => { return { from : square, to }; });
+                const promotions = decodePromotions(promotionMoves, this.state.board[square]> 0 ? 1 : -1);
+                this.setState({
+                    highlightedSquares: promotions.map(promotion => promotion.move.to),
+                    promotions
+                });
             } else {
-              this.setState({
-                  highlightedSquares: data
-              });
+                this.setState({
+                    highlightedSquares: data
+                });
             }
         }));
+    }
+
+    handleChoosePromotionPiece(promotion: Promotion) {
+        const square = this.state.selectedSquare;
+        this.makeMove({
+            from: square,
+            to: encodePromotions([promotion], this.state.board[square]> 0 ? 1 : -1)[0]
+        });
+        this.setState({ selectedPromotionSquare: -1 });
     }
 
     handleFlipBoardClick() {
         this.setState({ flipped: !this.state.flipped });
     }
 
+    handlePromotionDialogClose() {
+        this.setState({ selectedPromotionSquare: -1 });
+    }
+
     handleSquareClick(square: number) {
         if (this.state.highlightedSquares.includes(square)) {
-            const move: Move = { from: this.state.selectedSquare, to: square }
-            fetch(MOVE_API_URL, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(move)
-            }).then((res: Response) => res.json().then(data => {
-                this.setState({
-                    board: data,
-                    highlightedSquares: [],
-                    selectedSquare: -1
+            if (this.state.promotions.map(promotion => promotion.move.to).includes(square)) {
+                this.setState({ selectedPromotionSquare: square });
+            } else {
+                this.makeMove({
+                    from: this.state.selectedSquare,
+                    to: square
                 });
-            }));
+            }
         } else if (this.state.board[square] !== 0) {
             this.getMoves(square);
             this.setState({
@@ -97,9 +117,27 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             });
         } else {
             this.setState({
-                highlightedSquares: []
+                highlightedSquares: [],
+                promotions: [],
             });
         }
+    }
+
+    makeMove(move: Move) {
+        fetch(MOVE_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(move)
+        }).then((res: Response) => res.json().then(data => {
+            this.setState({
+                board: data,
+                highlightedSquares: [],
+                promotions: [],
+                selectedSquare: -1
+            });
+        }));
     }
 
     render() {
@@ -129,11 +167,30 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                 </div>
                 <div className={`${this.COMPONENT_CSS_CLASS}__toolbar`}>
                     <Tooltip title="Flip board">
-                        <IconButton aria-label="Flip board" onClick={this.handleFlipBoardClick}>
+                        <IconButton aria-label="Flip board" color="primary" onClick={this.handleFlipBoardClick}>
                             <FlipCameraAndroidIcon />
                         </IconButton>
                     </Tooltip>
                 </div>
+                <Dialog onClose={this.handlePromotionDialogClose} open={this.state.selectedPromotionSquare >= 0}>
+                    <DialogTitle>Choose a Piece:</DialogTitle>
+                    <div className={`${this.COMPONENT_CSS_CLASS}__promotion-button-wrapper`}>
+                        {
+                            this.state.promotions
+                                .filter(promotion => promotion.move.to === this.state.selectedPromotionSquare)
+                                .map(promotion => (
+                                    <button
+                                        onClick={this.handleChoosePromotionPiece.bind(this, promotion)}
+                                        className={`${this.COMPONENT_CSS_CLASS}__promotion-button`}
+                                    >
+                                        <img src={
+                                            PieceIconMaps.find(map => map.pieceCode === promotion.promote_to)?.url || ''
+                                        } />
+                                    </button>
+                            ))
+                        }
+                    </div>
+                </Dialog>
             </div>
         );
     }

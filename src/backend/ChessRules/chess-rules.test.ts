@@ -94,17 +94,23 @@ describe('Test Make Move', () => {
         let game = JSON.parse(JSON.stringify(promotion));
         game = makeMove({ from: 9, to: 80 }, game);
 
+        expect(game.board.length).toBe(64);
         expect(game.board[1]).toBe(PieceCode.WhiteQueen);
-
+        expect(game.active_color).toBe(ActiveColor.Black);
+        
         game = JSON.parse(JSON.stringify(promotion));
         game = makeMove({ from: 9, to: 64 }, game);
-
+        
+        expect(game.board.length).toBe(64);
         expect(game.board[0]).toBe(PieceCode.WhiteKnight);
-
+        expect(game.active_color).toBe(ActiveColor.Black);
+        
         game = JSON.parse(JSON.stringify(promotion));
         game = makeMove({ from: 9, to: 85 }, game);
-
+        
+        expect(game.board.length).toBe(64);
         expect(game.board[2]).toBe(PieceCode.WhiteBishop);
+        expect(game.active_color).toBe(ActiveColor.Black);
     });
 });
 

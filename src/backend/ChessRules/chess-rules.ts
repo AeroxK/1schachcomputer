@@ -1,5 +1,7 @@
+import { LensTwoTone } from "@material-ui/icons";
 import { ActiveColor, ChessGame, Move, PieceCode, Direction2D, Distance, Promotion } from "../../shared/types";
-import { calcOffset, decodePromotions, encodePromotions } from "../../shared/util";
+import { calcOffset, decodePromotions, encodePromotions, isMovePromotion } from "../../shared/util";
+import { promotion } from "./samples/positions";
 
 interface MovePatternFunction {
     (game: ChessGame, square: number): number[]
@@ -209,9 +211,9 @@ pawnMoves = (game, square) => {
             [PieceCode.WhiteKnight, PieceCode.WhiteBishop, PieceCode.WhiteRook, PieceCode.WhiteQueen] :
             [PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackRook, PieceCode.BlackQueen];
         const promotions: Promotion[] = squares
-            .map(square => promotionPieces.map(promote_to => { return { promote_to, square }; }))
+            .map(promotionSquare => promotionPieces.map(promote_to => { return { move: { from: square, to: promotionSquare }, promote_to }; }))
             .reduce((allPromotions: Promotion[], current: Promotion[]) => allPromotions.concat(current), []);
-        return encodePromotions(promotions, square, isWhite ? ActiveColor.White : ActiveColor.Black);
+        return encodePromotions(promotions, isWhite ? ActiveColor.White : ActiveColor.Black);
     } else {
         return squares;
     }
@@ -276,7 +278,15 @@ function isActiveKingInCheck(game: ChessGame):boolean {
         .map(el => el.square);
     
     return enemyPieceSquares.some(enemyPiece => {
-        return getActiveColorIndependentSquares(game, enemyPiece).includes(kingPosition)
+        let squares = getActiveColorIndependentSquares(game, enemyPiece);
+        if (squares.length && isMovePromotion({ from: enemyPiece, to: squares[0] })) {
+            let promotions = decodePromotions(
+                squares.map(square => { return { from: enemyPiece, to: square }; }),
+                game.active_color > 0 ? -1 : 1
+            );
+            squares = promotions.map(promotion => promotion.move.to);
+        }
+        return squares.includes(kingPosition);
     });
 }
 
@@ -367,27 +377,26 @@ function manageEnPassant(move: Move, game: ChessGame, blackMoved: boolean):Chess
     return game;
 }
 
-function managePromotions(move: Move, game: ChessGame): ChessGame {
-    const promotion: Promotion = decodePromotions([move.to], move.from, game.active_color)[0];
-
-    game.board[promotion.square] = promotion.promote_to;
+function managePromotions(move: Move, game: ChessGame, blackMoved: boolean): ChessGame {
+    const promotion: Promotion = decodePromotions([move], blackMoved ? -1 : 1)[0];
+    game.board[promotion.move.to] = promotion.promote_to;
     game.board[move.from] = PieceCode.EmptySquare;
-
     return game;
 }
 
 function makeMove(move: Move, game: ChessGame):ChessGame {
-    if (move.to > 63 || move.to < 0) {
-        game = managePromotions(move, game);
+
+    const blackMoved = game.active_color < 0;
+
+    game = manageCastlingAvailability(move, game, blackMoved);
+    game = manageHalfmoveClock(move, game, blackMoved);
+    game = manageFullmoveNumber(game, blackMoved);
+    game = manageActiveColor(game, blackMoved);
+    game = manageEnPassant(move, game, blackMoved);
+
+    if (isMovePromotion(move)) {
+        game = managePromotions(move, game, blackMoved);
     } else {
-        const blackMoved = game.active_color < 0;
-    
-        game = manageCastlingAvailability(move, game, blackMoved);
-        game = manageHalfmoveClock(move, game, blackMoved);
-        game = manageFullmoveNumber(game, blackMoved);
-        game = manageActiveColor(game, blackMoved);
-        game = manageEnPassant(move, game, blackMoved);
-    
         game.board[move.to] = game.board[move.from];
         game.board[move.from] = PieceCode.EmptySquare;
     }
