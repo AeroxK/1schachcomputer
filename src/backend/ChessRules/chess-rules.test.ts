@@ -9,7 +9,8 @@ import {
     castling,
     castlingBlockedByEnemy,
     nimzoIndian,
-    bogoIndian
+    bogoIndian,
+    captureRook
 } from './samples/positions';
 
 describe('Test Make Move', () => {
@@ -75,12 +76,17 @@ describe('Test Make Move', () => {
         
         expect(game.castling_availability.black.kingside).toBeFalsy();
         expect(game.castling_availability.black.queenside).toBeTruthy();
-
+        
         game = JSON.parse(JSON.stringify(castling));
         game = makeMove({ from: 60, to: 62 }, game);
-
+        
         expect(game.board[63]).toBe(PieceCode.EmptySquare);
         expect(game.board[61]).toBe(PieceCode.WhiteRook);
+        
+        game = JSON.parse(JSON.stringify(captureRook));
+        game = makeMove({ from: 9, to: 63 }, game);
+
+        expect(game.castling_availability.white.kingside).toBeFalsy();
     });
 
 });

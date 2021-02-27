@@ -302,6 +302,9 @@ function manageCastlingAvailability(move: Move, game: ChessGame, blackMoved: boo
     const castling = blackMoved ? game.castling_availability.black : game.castling_availability.white;
     const queensideRookSquare = blackMoved ? 0 : 56;
     const kingsideRookSquare = blackMoved ? 7 : 63;
+    const castlingOpponent = blackMoved ? game.castling_availability.white : game.castling_availability.black;
+    const queensideRookSquareOpponent = blackMoved ? 56 : 0;
+    const kingsideRookSquareOpponent = blackMoved ? 63 : 7;
     if ((castling.kingside || castling.queenside) && game.board[move.from] === kingPieceCode) {
         castling.kingside = false;
         castling.queenside = false;
@@ -317,6 +320,10 @@ function manageCastlingAvailability(move: Move, game: ChessGame, blackMoved: boo
         castling.queenside = false;
     } else if (castling.kingside && move.from === kingsideRookSquare) {
         castling.kingside = false;
+    } else if (castlingOpponent.kingside && move.to === kingsideRookSquareOpponent) {
+        castlingOpponent.kingside = false;
+    } else if (castlingOpponent.queenside && move.to === queensideRookSquareOpponent) {
+        castlingOpponent.queenside = false;
     }
     return game;
 }
