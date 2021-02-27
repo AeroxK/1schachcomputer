@@ -224,7 +224,8 @@ pawnMoves = (game, square) => {
                 [PieceCode.WhiteKnight, PieceCode.WhiteBishop, PieceCode.WhiteRook, PieceCode.WhiteQueen] :
                 [PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackRook, PieceCode.BlackQueen];
             const pieceCodeOffset = isWhite ? 10 : -10;
-            return promotionPieceCodes.map(promoCode => (promoCode + pieceCodeOffset * (i + 1)) * square);
+            const horizontal_offset = promotionSquare - (square + moveDirection.vertical_direction * Distance.Vertical); 
+            return promotionPieceCodes.map(promoCode => (promoCode + pieceCodeOffset * (horizontal_offset + 2)) * square);
         }).reduce((allPromoCodes, promoCodeArr) => allPromoCodes.concat(promoCodeArr), []);
     } else {
         return squares;

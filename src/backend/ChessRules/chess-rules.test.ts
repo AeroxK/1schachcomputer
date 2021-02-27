@@ -222,6 +222,13 @@ describe('Test Piece Moves', () => {
         squares = getLegalSquaresForPiece(game, 9);
 
         expect(squares.sort()).toEqual([117, 126, 171, 135, 207, 216, 261, 225, 297, 306, 351, 315].sort());
+        
+        game.board[49] = PieceCode.BlackPawn;
+        game.board[57] = PieceCode.EmptySquare;
+        game.active_color = ActiveColor.Black;
+        squares = getLegalSquaresForPiece(game, 49);
+
+        expect(squares.sort()).toEqual([-637, -1127, -1617, -686, -1176, -1666, -735, -1225, -1715, -931, -1421, -1911].sort());
     });
 
 });
