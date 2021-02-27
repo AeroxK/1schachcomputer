@@ -45,3 +45,20 @@ export interface Move {
     from: number,
     to: number
 }
+
+export interface Promotion {
+    promote_to: PieceCode,
+    square: number
+}
+
+export type Direction = -2 | -1 | 0 | 1 | 2;
+
+export interface Direction2D {
+    horizontal_direction: Direction,
+    vertical_direction: Direction
+}
+
+export enum Distance {
+    Horizontal = 1,
+    Vertical = 8
+}

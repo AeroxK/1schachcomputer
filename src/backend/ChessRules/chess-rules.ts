@@ -1,5 +1,5 @@
-import { ActiveColor, ChessGame, Move, PieceCode } from "../../shared/types";
-import { promotion } from "./samples/positions";
+import { ActiveColor, ChessGame, Move, PieceCode, Direction2D, Distance, Promotion } from "../../shared/types";
+import { calcOffset, decodePromotions, encodePromotions } from "../../shared/util";
 
 interface MovePatternFunction {
     (game: ChessGame, square: number): number[]
@@ -8,16 +8,6 @@ interface MovePatternFunction {
 type PieceMovePatternMap = {
     move_pattern_fn: MovePatternFunction,
     piece_codes: PieceCode[]
-}
-
-type Direction2D = {
-    horizontal_direction: -2 | -1 | 0 | 1 | 2,
-    vertical_direction: -2 | -1 | 0 | 1 | 2
-}
-
-enum Distance {
-    Horizontal = 1,
-    Vertical = 8
 }
 
 function isFriendlyPiece(my_square: number, other_square: number, game: ChessGame):boolean {
@@ -32,10 +22,6 @@ function isEnemyPiece(my_square: number, other_square: number, game: ChessGame):
     const other_piece_code = game.board[other_square];
 
     return other_piece_code !== 0 && other_piece_code > 0 !== my_piece_code > 0;
-}
-
-function offset(direction: Direction2D):number {
-    return direction.horizontal_direction * Distance.Horizontal + direction.vertical_direction * Distance.Vertical;
 }
 
 function isEdgeInDirection(square: number, direction: Direction2D) {
@@ -170,7 +156,7 @@ kingMoves = (game, square) => {
                     });
                 }))
         {
-            squares.push(square + offset({ horizontal_direction: -2, vertical_direction: 0 }));
+            squares.push(square + calcOffset({ horizontal_direction: -2, vertical_direction: 0 }));
         }
     }
 
@@ -185,7 +171,7 @@ kingMoves = (game, square) => {
                     });
                 }))
         {
-            squares.push(square + offset({ horizontal_direction: 2, vertical_direction: 0 }));
+            squares.push(square + calcOffset({ horizontal_direction: 2, vertical_direction: 0 }));
         }
     }
 
@@ -219,14 +205,13 @@ pawnMoves = (game, square) => {
 
     const isPromotion = (isWhite && square > 7 && square < 16) || (!isWhite && square > 47 && square < 56);
     if (isPromotion) {
-        return squares.map((promotionSquare, i) => {
-            const promotionPieceCodes: PieceCode[] = isWhite ? 
-                [PieceCode.WhiteKnight, PieceCode.WhiteBishop, PieceCode.WhiteRook, PieceCode.WhiteQueen] :
-                [PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackRook, PieceCode.BlackQueen];
-            const pieceCodeOffset = isWhite ? 10 : -10;
-            const horizontal_offset = promotionSquare - (square + moveDirection.vertical_direction * Distance.Vertical); 
-            return promotionPieceCodes.map(promoCode => (promoCode + pieceCodeOffset * (horizontal_offset + 2)) * square);
-        }).reduce((allPromoCodes, promoCodeArr) => allPromoCodes.concat(promoCodeArr), []);
+        const promotionPieces: PieceCode[] = isWhite ?
+            [PieceCode.WhiteKnight, PieceCode.WhiteBishop, PieceCode.WhiteRook, PieceCode.WhiteQueen] :
+            [PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackRook, PieceCode.BlackQueen];
+        const promotions: Promotion[] = squares
+            .map(square => promotionPieces.map(promote_to => { return { promote_to, square }; }))
+            .reduce((allPromotions: Promotion[], current: Promotion[]) => allPromotions.concat(current), []);
+        return encodePromotions(promotions, square, isWhite ? ActiveColor.White : ActiveColor.Black);
     } else {
         return squares;
     }
@@ -365,17 +350,17 @@ function manageEnPassant(move: Move, game: ChessGame, blackMoved: boolean):Chess
     let direction: Direction2D = { horizontal_direction: 0, vertical_direction: blackMoved ? -1 : 1 };
 
     if (move.to === game.en_passant_square && game.board[move.from] === pawnPieceCode) {
-        game.board[move.to + offset(direction)] = PieceCode.EmptySquare;
+        game.board[move.to + calcOffset(direction)] = PieceCode.EmptySquare;
     }
 
     direction = { horizontal_direction: 0, vertical_direction: blackMoved ? 2 : -2 };
 
     if (
         game.board[move.from] === pawnPieceCode &&
-        move.to - move.from === offset(direction)
+        move.to - move.from === calcOffset(direction)
         ) {
         direction.vertical_direction = blackMoved ? 1 : -1;
-        game.en_passant_square = move.from + offset(direction);
+        game.en_passant_square = move.from + calcOffset(direction);
     } else {
         game.en_passant_square = -1;
     }
@@ -383,18 +368,9 @@ function manageEnPassant(move: Move, game: ChessGame, blackMoved: boolean):Chess
 }
 
 function managePromotions(move: Move, game: ChessGame): ChessGame {
-    let directionToLeftMostPromotionSquare: Direction2D = 
-        { horizontal_direction: -2, vertical_direction: game.active_color > 0 ? -1 : 1 };
-    let pieceCodePlusOffset = move.to / move.from;
-    let promotionSquare = move.from + offset(directionToLeftMostPromotionSquare);
-    let squareEncodingOffset = game.active_color * 10;
+    const promotion: Promotion = decodePromotions([move.to], move.from, game.active_color)[0];
 
-    while (pieceCodePlusOffset > 10 || pieceCodePlusOffset < -10) {
-        promotionSquare = promotionSquare + 1 * Distance.Horizontal;
-        pieceCodePlusOffset = pieceCodePlusOffset - squareEncodingOffset;
-    }
-
-    game.board[promotionSquare] = pieceCodePlusOffset;
+    game.board[promotion.square] = promotion.promote_to;
     game.board[move.from] = PieceCode.EmptySquare;
 
     return game;
