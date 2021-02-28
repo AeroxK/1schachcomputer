@@ -1,36 +1,63 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
+import http from 'http';
+import { Server, Socket } from 'socket.io';
 
-import { GAME_API_URL, MOVE_API_URL } from '../shared/config';
+import { WebsocketEventNames } from '../shared/api/config';
+import { WebsocketEventDataInterfaces } from '../shared/api/types';
 import * as FenParser from './FenParser/fen-parser';
 import { getLegalSquaresForPiece, makeMove } from './ChessRules/chess-rules';
 import { ChessGame } from '../shared/types';
 
-const app = express();
-const port = 3000;
+let game: ChessGame = FenParser.read('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 
-app.use(express.json());
+const app = express();
 app.use(express.static('dist/assets'));
 
-let game: ChessGame;
+const httpServer = http.createServer(app);
+const port = 3000;
 
-app.get(GAME_API_URL, (req: Request, res: Response) => {
-    game = FenParser.read('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
-    res.send(game.board);
-});
+const io = new Server(httpServer, {});
 
-app.get(MOVE_API_URL, (req: Request, res: Response) => {
-    if (req.query.square && typeof req.query.square === "string" && !isNaN(parseInt(req.query.square))) {
-        res.send(getLegalSquaresForPiece(game, parseInt(req.query.square)));
-    } else {
-        res.sendStatus(400);
+io.on(WebsocketEventNames.Connection, (socket: Socket) =>
+    {
+        socket.join('game');
+        const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard] = {
+            board: game.board
+        };
+
+        socket.on(WebsocketEventNames.GetMoves, (
+            { piece_square, request_issuer }: WebsocketEventDataInterfaces[WebsocketEventNames.GetMoves]) =>
+            {
+                const squares: number[] = getLegalSquaresForPiece(game, piece_square)
+                const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateMoves] = {
+                    origin_square: piece_square,
+                    possible_squares: squares
+                }
+                io.to(request_issuer).emit(WebsocketEventNames.UpdateMoves, eventData);
+            }
+        );
+        socket.on(WebsocketEventNames.MakeMove, (
+            { move }: WebsocketEventDataInterfaces[WebsocketEventNames.MakeMove]) =>
+            {
+                game = makeMove(move, game);
+                const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard] = {
+                    board: game.board
+                };
+                io.to('game').emit(WebsocketEventNames.UpdateBoard, eventData);
+            }
+        );
+        socket.on(WebsocketEventNames.DiscardGame, () => {
+            game = FenParser.read('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+            const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard] = {
+                board: game.board
+            };
+            io.to('game').emit(WebsocketEventNames.UpdateBoard, eventData);
+        });
+
+        io.to(socket.id).emit(WebsocketEventNames.UpdateBoard, eventData);
     }
-});
+);
 
-app.post(MOVE_API_URL, (req: Request, res: Response) => {
-    game = makeMove(req.body, game);
-    res.send(game.board);
-});
-
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+httpServer.listen(port, () => {
+    console.log(`1schachcomputer available at http://localhost:${port}`)
 });

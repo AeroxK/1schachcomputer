@@ -1,13 +1,17 @@
 import React from 'react';
+import io from 'socket.io-client';
+
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
+import ImportExportIcon from '@material-ui/icons/ImportExport';
+import DeleteIcon from '@material-ui/icons/Delete';
 
-import { GAME_API_URL, MOVE_API_URL } from '../../shared/config';
 import { Board, Move, PieceCode, Promotion } from '../../shared/types';
 import { decodePromotions, encodePromotions } from '../../shared/util';
+import { WebsocketEventNames } from '../../shared/api/config';
+import { WebsocketEventDataInterfaces } from '../../shared/api/types';
 
 import { concatClasses } from '../shared/util';
 
@@ -48,6 +52,7 @@ const PieceIconMaps: PieceIconMap[] = [
 
 export default class ChessBoard extends React.Component<ChessBoardProps, ChessBoardState> {
     COMPONENT_CSS_CLASS: string;
+    socket: SocketIOClient.Socket;
     
     constructor(props: ChessBoardProps) {
         super(props);
@@ -61,26 +66,50 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             selectedPromotionSquare: -1,
         };
 
-        this.COMPONENT_CSS_CLASS = 'm-chess-board'
+        this.COMPONENT_CSS_CLASS = 'm-chess-board';
+        this.handleDiscardGameClick = this.handleDiscardGameClick.bind(this);
         this.handleFlipBoardClick = this.handleFlipBoardClick.bind(this);
         this.handlePromotionDialogClose = this.handlePromotionDialogClose.bind(this);
+
+        this.socket = io();
+
+        this.socket.on(WebsocketEventNames.UpdateMoves, (
+            { origin_square, possible_squares }: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateMoves]) =>
+            {
+                if (possible_squares.length && (possible_squares[0] > 63 || possible_squares[0] < 0)) {
+                    const promotionMoves = possible_squares.map((to: number) => { return { from : origin_square, to }; });
+                    const promotions = decodePromotions(promotionMoves, this.state.board[origin_square]> 0 ? 1 : -1);
+                    this.setState({
+                        highlightedSquares: promotions.map(promotion => promotion.move.to),
+                        promotions
+                    });
+                } else {
+                    this.setState({
+                        highlightedSquares: possible_squares
+                    });
+                }
+            }
+        );
+
+        this.socket.on(WebsocketEventNames.UpdateBoard, (
+            { board }: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard]) =>
+            {
+                this.setState({
+                    board,
+                    highlightedSquares: [],
+                    promotions: [],
+                    selectedSquare: -1
+                });
+            }
+        );
     }
 
     getMoves(square: number) {
-        fetch(`${MOVE_API_URL}?square=${square}`).then((res: Response) => res.json().then((data: number[]) => {
-            if (data.length && (data[0] > 63 || data[0] < 0)) {
-                const promotionMoves = data.map(to => { return { from : square, to }; });
-                const promotions = decodePromotions(promotionMoves, this.state.board[square]> 0 ? 1 : -1);
-                this.setState({
-                    highlightedSquares: promotions.map(promotion => promotion.move.to),
-                    promotions
-                });
-            } else {
-                this.setState({
-                    highlightedSquares: data
-                });
-            }
-        }));
+        const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.GetMoves] = {
+            piece_square: square,
+            request_issuer: this.socket.id
+        };
+        this.socket.emit(WebsocketEventNames.GetMoves, eventData);
     }
 
     handleChoosePromotionPiece(promotion: Promotion) {
@@ -90,6 +119,10 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             to: encodePromotions([promotion], this.state.board[square]> 0 ? 1 : -1)[0]
         });
         this.setState({ selectedPromotionSquare: -1 });
+    }
+
+    handleDiscardGameClick() {
+        this.socket.emit(WebsocketEventNames.DiscardGame);
     }
 
     handleFlipBoardClick() {
@@ -124,20 +157,10 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
     }
 
     makeMove(move: Move) {
-        fetch(MOVE_API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(move)
-        }).then((res: Response) => res.json().then(data => {
-            this.setState({
-                board: data,
-                highlightedSquares: [],
-                promotions: [],
-                selectedSquare: -1
-            });
-        }));
+        const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.MakeMove] = {
+            move
+        };
+        this.socket.emit(WebsocketEventNames.MakeMove, eventData);
     }
 
     render() {
@@ -168,7 +191,12 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                 <div className={`${this.COMPONENT_CSS_CLASS}__toolbar`}>
                     <Tooltip title="Flip board">
                         <IconButton aria-label="Flip board" color="primary" onClick={this.handleFlipBoardClick}>
-                            <FlipCameraAndroidIcon />
+                            <ImportExportIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Discard game">
+                        <IconButton aria-label="Discard game" color="primary" onClick={this.handleDiscardGameClick}>
+                            <DeleteIcon />
                         </IconButton>
                     </Tooltip>
                 </div>
@@ -193,13 +221,5 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                 </Dialog>
             </div>
         );
-    }
-    
-    componentDidMount() {
-        fetch(GAME_API_URL).then((res: Response) => res.json().then((data: Board) => {
-            this.setState({
-                board: data
-            });
-        }));
     }
 }
