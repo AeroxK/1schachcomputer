@@ -23,6 +23,7 @@ type ChessBoardProps = {
 
 type ChessBoardState = {
     board: Board,
+    dragSquare: number,
     flipped: boolean,
     highlightedSquares: number[],
     promotions: Promotion[],
@@ -59,6 +60,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
 
         this.state = {
             board: [],
+            dragSquare: -1,
             flipped: this.props.flipped || false,
             highlightedSquares: [],
             promotions: [],
@@ -96,6 +98,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             {
                 this.setState({
                     board,
+                    dragSquare: -1,
                     highlightedSquares: [],
                     promotions: [],
                     selectedSquare: -1
@@ -171,11 +174,10 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                 <button
                     draggable={ Boolean(piece) } 
                     onClick={this.handleSquareClick.bind(this, i)}
-                    onDragStart={(ev) => {
-                        ev.currentTarget.children[0].classList.add('hidden');
+                    onDragStart={() => {
+                        this.setState({ dragSquare: i });
                         this.handleSquareClick(i);
                     }}
-                    onDragEnd={(ev) => { ev.currentTarget.children[0].classList.remove('hidden'); }}
                     onDragOver={(ev) => { ev.dataTransfer.dropEffect = "move"; ev.preventDefault(); }}
                     onDrop={this.handleSquareClick.bind(this, i)} 
                     className={concatClasses([
@@ -184,7 +186,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                     ])}
                     key={i}
                 >
-                    { piece && <img src={imageUrl} /> }
+                    { piece && <img className={ this.state.dragSquare === i ? 'hidden' : '' } src={imageUrl} /> }
                 </button>
             );
         })
