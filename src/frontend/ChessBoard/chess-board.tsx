@@ -17,6 +17,9 @@ import { concatClasses } from '../shared/util';
 
 import './chess-board.scss';
 
+const move = require("./sounds/move.webm").default;
+const moveAudio = new Audio(move);
+
 type ChessBoardProps = {
     flipped?: boolean
 }
@@ -96,6 +99,8 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.socket.on(WebsocketEventNames.UpdateBoard, (
             { board }: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard]) =>
             {
+		if(this.state.board.length > 0)
+		    moveAudio.play();
                 this.setState({
                     board,
                     dragSquare: -1,
