@@ -176,7 +176,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                         this.handleSquareClick(i);
                     }}
                     onDragEnd={(ev) => { ev.currentTarget.children[0].classList.remove('hidden'); }}
-                    onDragOver={(ev) => { ev.preventDefault(); }}
+                    onDragOver={(ev) => { ev.dataTransfer.dropEffect = "move"; ev.preventDefault(); }}
                     onDrop={this.handleSquareClick.bind(this, i)} 
                     className={concatClasses([
                         `${this.COMPONENT_CSS_CLASS}__square`,
