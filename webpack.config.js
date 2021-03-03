@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: path.resolve(__dirname, 'src/frontend/index.tsx'),
   output: {
     filename: 'bundle.js',
@@ -23,6 +23,7 @@ module.exports = {
           { test: /\.tsx?$/i, use: 'ts-loader' },
           { test: /\.(png|svg|jpg|jpeg|gif)$/i, type: 'asset/resource' },
           { test: /\.(woff|woff2|eot|ttf|otf)$/i, type: 'asset/resource' },
+	  { test: /\.webm$/i, loader: 'file-loader' },
       ],
   },
 };
