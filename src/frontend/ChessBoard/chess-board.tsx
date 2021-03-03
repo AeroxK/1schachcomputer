@@ -166,16 +166,25 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
     render() {
         const squares = this.state.board.map((pieceCode: PieceCode, i: number) => {
             const piece = PieceIconMaps.find(map => map.pieceCode === pieceCode);
+            const imageUrl = piece ? piece.url : '';
             return (
                 <button
+                    draggable={ Boolean(piece) } 
                     onClick={this.handleSquareClick.bind(this, i)}
+                    onDragStart={(ev) => {
+                        ev.currentTarget.children[0].classList.add('hidden');
+                        this.handleSquareClick(i);
+                    }}
+                    onDragEnd={(ev) => { ev.currentTarget.children[0].classList.remove('hidden'); }}
+                    onDragOver={(ev) => { ev.preventDefault(); }}
+                    onDrop={this.handleSquareClick.bind(this, i)} 
                     className={concatClasses([
                         `${this.COMPONENT_CSS_CLASS}__square`,
                         this.state.highlightedSquares.includes(i) ? `${this.COMPONENT_CSS_CLASS}__square--highlighted` : ''
                     ])}
                     key={i}
                 >
-                    { piece && <img src={piece.url} /> }
+                    { piece && <img src={imageUrl} /> }
                 </button>
             );
         })
