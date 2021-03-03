@@ -20,6 +20,8 @@ import './chess-board.scss';
 const move = require("./sounds/move.webm").default;
 const moveAudio = new Audio(move);
 
+let movePerformed = false;
+
 type ChessBoardProps = {
     flipped?: boolean
 }
@@ -99,8 +101,8 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.socket.on(WebsocketEventNames.UpdateBoard, (
             { board }: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard]) =>
             {
-		if(this.state.board.length > 0)
-		    moveAudio.play();
+		if(this.state.board.length > 0) { moveAudio.play(); }
+        movePerformed = false;
                 this.setState({
                     board,
                     dragSquare: -1,
@@ -129,8 +131,8 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.setState({ selectedPromotionSquare: -1 });
     }
 
-    handleDragEnd(square: number) {
-        if (!this.state.highlightedSquares.includes(square)) {
+    handleDragEnd(square: number, ev: React.DragEvent<HTMLButtonElement>) {
+        if (!movePerformed) {
             this.setState({ dragSquare: -1 });
         }
     }
@@ -197,7 +199,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                         this.handleSquareClick(i);
                     }}
 
-                    onDrop={this.handleSquareClick.bind(this, i)} 
+                    onDrop={() => {  movePerformed = true; this.handleSquareClick(i); }} 
                     className={concatClasses([
                         `${this.COMPONENT_CSS_CLASS}__square`,
                         this.state.highlightedSquares.includes(i) ? `${this.COMPONENT_CSS_CLASS}__square--highlighted` : ''
