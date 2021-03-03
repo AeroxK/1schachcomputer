@@ -129,6 +129,12 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.setState({ selectedPromotionSquare: -1 });
     }
 
+    handleDragEnd(square: number) {
+        if (!this.state.highlightedSquares.includes(square)) {
+            this.setState({ dragSquare: -1 });
+        }
+    }
+
     handleDiscardGameClick() {
         this.socket.emit(WebsocketEventNames.DiscardGame);
     }
@@ -138,7 +144,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
     }
 
     handlePromotionDialogClose() {
-        this.setState({ selectedPromotionSquare: -1 });
+        this.setState({ dragSquare: -1, selectedPromotionSquare: -1 });
     }
 
     handleSquareClick(square: number) {
@@ -179,11 +185,18 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                 <button
                     draggable={ Boolean(piece) } 
                     onClick={this.handleSquareClick.bind(this, i)}
+                    onDragEnd={this.handleDragEnd.bind(this, i)}
+                    onDragEnter={(ev) => { ev.currentTarget.classList.add('dragover'); }}
+                    onDragLeave={(ev) => { ev.currentTarget.classList.remove('dragover'); }}
+                    onDragOver={
+                        this.state.highlightedSquares.includes(i) ?
+                            (ev) => { ev.dataTransfer.dropEffect = "move"; ev.preventDefault(); } : () => {}
+                    }
                     onDragStart={() => {
                         this.setState({ dragSquare: i });
                         this.handleSquareClick(i);
                     }}
-                    onDragOver={(ev) => { ev.dataTransfer.dropEffect = "move"; ev.preventDefault(); }}
+
                     onDrop={this.handleSquareClick.bind(this, i)} 
                     className={concatClasses([
                         `${this.COMPONENT_CSS_CLASS}__square`,
