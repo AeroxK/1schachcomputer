@@ -20,8 +20,6 @@ import './chess-board.scss';
 const move = require("./sounds/move.webm").default;
 const moveAudio = new Audio(move);
 
-let movePerformed = false;
-
 type ChessBoardProps = {
     flipped?: boolean
 }
@@ -31,6 +29,7 @@ type ChessBoardState = {
     dragSquare: number,
     flipped: boolean,
     highlightedSquares: number[],
+    processingMove: boolean,
     promotions: Promotion[],
     selectedPromotionSquare: number,
     selectedSquare: number,
@@ -68,6 +67,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             dragSquare: -1,
             flipped: this.props.flipped || false,
             highlightedSquares: [],
+            processingMove: false,
             promotions: [],
             selectedSquare: -1,
             selectedPromotionSquare: -1,
@@ -101,12 +101,12 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.socket.on(WebsocketEventNames.UpdateBoard, (
             { board }: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard]) =>
             {
-		if(this.state.board.length > 0) { moveAudio.play(); }
-        movePerformed = false;
+		        if(this.state.board.length > 0) { moveAudio.play(); }
+
                 this.setState({
                     board,
-                    dragSquare: -1,
                     highlightedSquares: [],
+                    processingMove: false,
                     promotions: [],
                     selectedSquare: -1
                 });
@@ -131,12 +131,6 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.setState({ selectedPromotionSquare: -1 });
     }
 
-    handleDragEnd(square: number, ev: React.DragEvent<HTMLButtonElement>) {
-        if (!movePerformed) {
-            this.setState({ dragSquare: -1 });
-        }
-    }
-
     handleDiscardGameClick() {
         this.socket.emit(WebsocketEventNames.DiscardGame);
     }
@@ -146,7 +140,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
     }
 
     handlePromotionDialogClose() {
-        this.setState({ dragSquare: -1, selectedPromotionSquare: -1 });
+        this.setState({ selectedPromotionSquare: -1 });
     }
 
     handleSquareClick(square: number) {
@@ -154,6 +148,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
             if (this.state.promotions.map(promotion => promotion.move.to).includes(square)) {
                 this.setState({ selectedPromotionSquare: square });
             } else {
+                this.setState({ processingMove: true });
                 this.makeMove({
                     from: this.state.selectedSquare,
                     to: square
@@ -187,7 +182,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                 <button
                     draggable={ Boolean(piece) } 
                     onClick={this.handleSquareClick.bind(this, i)}
-                    onDragEnd={this.handleDragEnd.bind(this, i)}
+                    onDragEnd={() => { this.setState({ dragSquare: -1 }); }}
                     onDragEnter={(ev) => { ev.currentTarget.classList.add('dragover'); }}
                     onDragLeave={(ev) => { ev.currentTarget.classList.remove('dragover'); }}
                     onDragOver={
@@ -199,14 +194,14 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                         this.handleSquareClick(i);
                     }}
 
-                    onDrop={() => {  movePerformed = true; this.handleSquareClick(i); }} 
+                    onDrop={this.handleSquareClick.bind(this, i)} 
                     className={concatClasses([
                         `${this.COMPONENT_CSS_CLASS}__square`,
                         this.state.highlightedSquares.includes(i) ? `${this.COMPONENT_CSS_CLASS}__square--highlighted` : ''
                     ])}
                     key={i}
                 >
-                    { piece && <img className={ this.state.dragSquare === i ? 'hidden' : '' } src={imageUrl} /> }
+                    { piece && <img className={ this.state.dragSquare === i || (this.state.selectedSquare === i && this.state.processingMove) ? 'hidden' : '' } src={imageUrl} /> }
                 </button>
             );
         })
