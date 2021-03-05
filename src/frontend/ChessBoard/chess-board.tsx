@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import io from 'socket.io-client';
 
-import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 import DeleteIcon from '@material-ui/icons/Delete';
+import LoadingSpinner from '../LoadingSpinner/loading-spinner';
 
 import { Board, Move, PieceCode, Promotion } from '../../shared/types';
 import { decodePromotions, encodePromotions } from '../../shared/util';
 import { WebsocketEventNames } from '../../shared/api/config';
 import { WebsocketEventDataInterfaces } from '../../shared/api/types';
-
 import { concatClasses } from '../shared/util';
+
+const Dialog = lazy(() => import('@material-ui/core/Dialog'));
 
 import './chess-board.scss';
 
@@ -226,25 +227,27 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                         </IconButton>
                     </Tooltip>
                 </div>
-                <Dialog onClose={this.handlePromotionDialogClose} open={this.state.selectedPromotionSquare >= 0}>
-                    <DialogTitle>Choose a Piece:</DialogTitle>
-                    <div className={`${this.COMPONENT_CSS_CLASS}__promotion-button-wrapper`}>
-                        {
-                            this.state.promotions
-                                .filter(promotion => promotion.to === this.state.selectedPromotionSquare)
-                                .map(promotion => (
-                                    <button
-                                        onClick={this.handleChoosePromotionPiece.bind(this, promotion)}
-                                        className={`${this.COMPONENT_CSS_CLASS}__promotion-button`}
-                                    >
-                                        <img src={
-                                            PieceIconMaps.find(map => map.pieceCode === promotion.promote_to)?.url || ''
-                                        } />
-                                    </button>
-                            ))
-                        }
-                    </div>
-                </Dialog>
+                <Suspense fallback={ <LoadingSpinner /> }>
+                    <Dialog onClose={this.handlePromotionDialogClose} open={this.state.selectedPromotionSquare >= 0}>
+                        <DialogTitle>Choose a Piece:</DialogTitle>
+                        <div className={`${this.COMPONENT_CSS_CLASS}__promotion-button-wrapper`}>
+                            {
+                                this.state.promotions
+                                    .filter(promotion => promotion.to === this.state.selectedPromotionSquare)
+                                    .map(promotion => (
+                                        <button
+                                            onClick={this.handleChoosePromotionPiece.bind(this, promotion)}
+                                            className={`${this.COMPONENT_CSS_CLASS}__promotion-button`}
+                                        >
+                                            <img src={
+                                                PieceIconMaps.find(map => map.pieceCode === promotion.promote_to)?.url || ''
+                                            } />
+                                        </button>
+                                ))
+                            }
+                        </div>
+                    </Dialog>
+                </Suspense>
             </div>
         );
     }
