@@ -14,12 +14,34 @@ export enum PieceCode {
     WhiteKing = 99
 }
 
+export type Board = PieceCode[];
+
+export type Direction = -2 | -1 | 0 | 1 | 2;
+
+export interface Direction2D {
+    horizontal_direction: Direction,
+    vertical_direction: Direction
+}
+
+export enum Distance {
+    Horizontal = 1,
+    Vertical = 8
+}
+
+export interface Move {
+    from: number,
+    to: number
+}
+
+export interface Promotion {
+    move: Move,
+    promote_to: PieceCode,
+}
+
 export enum ActiveColor {
     Black = -1,
     White = 1
 }
-
-export type Board = PieceCode[];
 
 interface CastlingAvailability {
     white: {
@@ -41,24 +63,20 @@ export interface GameState {
     fullmove_number: number
 }
 
-export interface Move {
-    from: number,
-    to: number
+export interface MoveListItem extends Move {
+    game_state: GameState
 }
 
-export interface Promotion {
-    move: Move,
-    promote_to: PieceCode,
+export enum ChessResult {
+    White = 'white',
+    Draw = 'draw',
+    Black = 'black'
 }
 
-export type Direction = -2 | -1 | 0 | 1 | 2;
-
-export interface Direction2D {
-    horizontal_direction: Direction,
-    vertical_direction: Direction
-}
-
-export enum Distance {
-    Horizontal = 1,
-    Vertical = 8
+export interface ChessGame {
+    black_player: string,
+    white_player: string,
+    game_state: GameState,
+    result: ChessResult,
+    moves: Move[]
 }
