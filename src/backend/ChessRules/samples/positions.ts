@@ -1,6 +1,6 @@
-import { ChessGame, PieceCode, ActiveColor } from '../../../shared/types'
+import { GameState, PieceCode, ActiveColor } from '../../../shared/types'
 
-export const startingPosition: ChessGame = {
+export const startingPosition: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
         PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,
@@ -21,7 +21,7 @@ export const startingPosition: ChessGame = {
     fullmove_number: 1
 };
 
-export const e4e5: ChessGame = {
+export const e4e5: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
         PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.EmptySquare, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,
@@ -43,7 +43,7 @@ export const e4e5: ChessGame = {
 };
 
 
-export const scandinavian: ChessGame = {
+export const scandinavian: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
         PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.EmptySquare, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,
@@ -64,7 +64,7 @@ export const scandinavian: ChessGame = {
     fullmove_number: 2
 };
 
-export const enPassant: ChessGame = {
+export const enPassant: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
         PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.EmptySquare,
@@ -85,7 +85,7 @@ export const enPassant: ChessGame = {
     fullmove_number: 3
 };
 
-export const enPassantExpired: ChessGame = {
+export const enPassantExpired: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
         PieceCode.EmptySquare, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.EmptySquare,
@@ -106,7 +106,7 @@ export const enPassantExpired: ChessGame = {
     fullmove_number: 4
 };
 
-export const castling: ChessGame = {
+export const castling: GameState = {
   board: [
       PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
       PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,
@@ -127,7 +127,7 @@ export const castling: ChessGame = {
   fullmove_number: 1
 };
 
-export const castlingBlockedByEnemy: ChessGame = {
+export const castlingBlockedByEnemy: GameState = {
   board: [
       PieceCode.BlackRook, PieceCode.EmptySquare, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
       PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,
@@ -148,7 +148,7 @@ export const castlingBlockedByEnemy: ChessGame = {
   fullmove_number: 1
 };
 
-export const nimzoIndian: ChessGame = {
+export const nimzoIndian: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.EmptySquare, PieceCode.EmptySquare, PieceCode.BlackRook,
         PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.EmptySquare, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,
@@ -169,7 +169,7 @@ export const nimzoIndian: ChessGame = {
     fullmove_number: 4
 };
 
-export const bogoIndian: ChessGame = {
+export const bogoIndian: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.EmptySquare, PieceCode.EmptySquare, PieceCode.BlackRook,
         PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.EmptySquare, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,
@@ -190,7 +190,7 @@ export const bogoIndian: ChessGame = {
     fullmove_number: 4
 };
 
-export const captureRook: ChessGame = {
+export const captureRook: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.BlackKnight, PieceCode.EmptySquare, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
         PieceCode.BlackPawn, PieceCode.BlackBishop, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,
@@ -211,7 +211,7 @@ export const captureRook: ChessGame = {
     fullmove_number: 1
 };
 
-export const promotion: ChessGame = {
+export const promotion: GameState = {
     board: [
         PieceCode.BlackRook, PieceCode.EmptySquare, PieceCode.BlackBishop, PieceCode.BlackQueen, PieceCode.BlackKing, PieceCode.BlackBishop, PieceCode.BlackKnight, PieceCode.BlackRook,
         PieceCode.BlackPawn, PieceCode.WhitePawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn, PieceCode.BlackPawn,

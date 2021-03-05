@@ -87,7 +87,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                     const promotionMoves = possible_squares.map((to: number) => { return { from : origin_square, to }; });
                     const promotions = decodePromotions(promotionMoves, this.state.board[origin_square]> 0 ? 1 : -1);
                     this.setState({
-                        highlightedSquares: promotions.map(promotion => promotion.move.to),
+                        highlightedSquares: promotions.map(promotion => promotion.to),
                         promotions
                     });
                 } else {
@@ -145,7 +145,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
 
     handleSquareClick(square: number) {
         if (this.state.highlightedSquares.includes(square)) {
-            if (this.state.promotions.map(promotion => promotion.move.to).includes(square)) {
+            if (this.state.promotions.map(promotion => promotion.to).includes(square)) {
                 this.setState({ selectedPromotionSquare: square });
             } else {
                 this.setState({ processingMove: true });
@@ -231,7 +231,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
                     <div className={`${this.COMPONENT_CSS_CLASS}__promotion-button-wrapper`}>
                         {
                             this.state.promotions
-                                .filter(promotion => promotion.move.to === this.state.selectedPromotionSquare)
+                                .filter(promotion => promotion.to === this.state.selectedPromotionSquare)
                                 .map(promotion => (
                                     <button
                                         onClick={this.handleChoosePromotionPiece.bind(this, promotion)}
