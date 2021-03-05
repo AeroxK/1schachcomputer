@@ -19,7 +19,7 @@ export function decodePromotions(promotionMoves: Move[], active_color: ActiveCol
             pieceCodePlusOffset = pieceCodePlusOffset - squareEncodingOffset;
         }
 
-        return { move: { from: move.from, to: promotionSquare }, promote_to: pieceCodePlusOffset };
+        return { from: move.from, to: promotionSquare, promote_to: pieceCodePlusOffset };
     });
 }
 
@@ -27,7 +27,7 @@ export function encodePromotions(promotions: Promotion[], active_color: ActiveCo
     const moveDirection: Direction2D = { horizontal_direction: 0, vertical_direction: active_color > 0 ? -1 : 1 }
     return promotions.map((promotion, i) => {
         const pieceCodeOffset = 10 * active_color;
-        const horizontal_offset = promotion.move.to - (promotion.move.from + moveDirection.vertical_direction * Distance.Vertical); 
+        const horizontal_offset = promotion.to - (promotion.from + moveDirection.vertical_direction * Distance.Vertical); 
         return promotion.promote_to + PROMOTION_OFFSET * active_color + pieceCodeOffset * (horizontal_offset + 2);
     });
 }
