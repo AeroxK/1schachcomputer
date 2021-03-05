@@ -4,9 +4,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = (env) => {
   return {
     mode: env.NODE_ENV,
-    entry: path.resolve(__dirname, 'src/frontend/index.tsx'),
+    entry: {
+        index: path.resolve(__dirname, 'src/frontend/index.tsx'),
+    },
     output: {
-      filename: 'bundle.js',
+      filename: '[name].bundle.js',
       path: path.resolve(__dirname, 'dist/assets'),
     },
     plugins: [
@@ -26,6 +28,7 @@ module.exports = (env) => {
                 use: [{
                         loader: 'ts-loader',
                         options: {
+                            configFile: 'tsconfig.frontend.json',
                             transpileOnly: env.NODE_ENV === 'production'
                         }
                     }]
