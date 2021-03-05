@@ -32,7 +32,7 @@ interface CastlingAvailability {
     }
 }
 
-export interface ChessGame {
+export interface GameState {
     board: Board;
     active_color: ActiveColor;
     castling_availability: CastlingAvailability,

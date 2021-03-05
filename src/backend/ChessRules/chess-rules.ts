@@ -1,10 +1,8 @@
-import { LensTwoTone } from "@material-ui/icons";
-import { ActiveColor, ChessGame, Move, PieceCode, Direction2D, Distance, Promotion } from "../../shared/types";
+import { ActiveColor, GameState, Move, PieceCode, Direction2D, Distance, Promotion } from "../../shared/types";
 import { calcOffset, decodePromotions, encodePromotions, isMovePromotion } from "../../shared/util";
-import { promotion } from "./samples/positions";
 
 interface MovePatternFunction {
-    (game: ChessGame, square: number): number[]
+    (game: GameState, square: number): number[]
 }
 
 type PieceMovePatternMap = {
@@ -12,14 +10,14 @@ type PieceMovePatternMap = {
     piece_codes: PieceCode[]
 }
 
-function isFriendlyPiece(my_square: number, other_square: number, game: ChessGame):boolean {
+function isFriendlyPiece(my_square: number, other_square: number, game: GameState):boolean {
     const my_piece_code = game.board[my_square];
     const other_piece_code = game.board[other_square];
 
     return other_piece_code !== 0 && other_piece_code > 0 === my_piece_code > 0;
 }
 
-function isEnemyPiece(my_square: number, other_square: number, game: ChessGame):boolean {
+function isEnemyPiece(my_square: number, other_square: number, game: GameState):boolean {
     const my_piece_code = game.board[my_square];
     const other_piece_code = game.board[other_square];
 
@@ -35,7 +33,7 @@ function isEdgeInDirection(square: number, direction: Direction2D) {
     );
 }
 
-function findSquaresInDirection(game: ChessGame, square: number, direction: Direction2D, maxSteps: number = -1): number[] {
+function findSquaresInDirection(game: GameState, square: number, direction: Direction2D, maxSteps: number = -1): number[] {
     if (isEdgeInDirection(square, direction)) return [];
     let next_square = square + (direction.vertical_direction * Distance.Vertical + direction.horizontal_direction * Distance.Horizontal);
     let squares: number[] = [];
@@ -269,7 +267,7 @@ getActiveColorIndependentSquares = (game, square) => {
         .reduce((allSquares, currSquares) => allSquares.concat(currSquares), []);
 }
 
-function isActiveKingInCheck(game: ChessGame):boolean {
+function isActiveKingInCheck(game: GameState):boolean {
     const kingPieceCode = game.active_color > 0 ? PieceCode.WhiteKing : PieceCode.BlackKing;
     const kingPosition = game.board.indexOf(kingPieceCode);
     const enemyPieceSquares = game.board
@@ -303,7 +301,7 @@ getLegalSquaresForPiece = (game, square) => {
     });
 }
 
-function manageCastlingAvailability(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
+function manageCastlingAvailability(move: Move, game: GameState, blackMoved: boolean):GameState {
     const kingPieceCode = blackMoved ? PieceCode.BlackKing : PieceCode.WhiteKing;
     const rookPieceCode = blackMoved ? PieceCode.BlackRook : PieceCode.WhiteRook;
     const castling = blackMoved ? game.castling_availability.black : game.castling_availability.white;
@@ -335,7 +333,7 @@ function manageCastlingAvailability(move: Move, game: ChessGame, blackMoved: boo
     return game;
 }
 
-function manageHalfmoveClock(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
+function manageHalfmoveClock(move: Move, game: GameState, blackMoved: boolean):GameState {
     const pawnPieceCode: PieceCode = blackMoved ? PieceCode.BlackPawn : PieceCode.WhitePawn;
     if (game.board[move.from] === pawnPieceCode || game.board[move.to] !== 0) {
         game.halfmove_clock = 0;
@@ -345,17 +343,17 @@ function manageHalfmoveClock(move: Move, game: ChessGame, blackMoved: boolean):C
     return game;
 }
 
-function manageFullmoveNumber(game: ChessGame, blackMoved: boolean):ChessGame {
+function manageFullmoveNumber(game: GameState, blackMoved: boolean):GameState {
     game.fullmove_number = blackMoved ? game.fullmove_number + 1 : game.fullmove_number;
     return game;
 }
 
-function manageActiveColor(game: ChessGame, blackMoved: boolean):ChessGame {
+function manageActiveColor(game: GameState, blackMoved: boolean):GameState {
     game.active_color = blackMoved ? ActiveColor.White : ActiveColor.Black;
     return game;
 }
 
-function manageEnPassant(move: Move, game: ChessGame, blackMoved: boolean):ChessGame {
+function manageEnPassant(move: Move, game: GameState, blackMoved: boolean):GameState {
     const pawnPieceCode: PieceCode = blackMoved ? PieceCode.BlackPawn : PieceCode.WhitePawn;
     let direction: Direction2D = { horizontal_direction: 0, vertical_direction: blackMoved ? -1 : 1 };
 
@@ -377,14 +375,14 @@ function manageEnPassant(move: Move, game: ChessGame, blackMoved: boolean):Chess
     return game;
 }
 
-function managePromotions(move: Move, game: ChessGame, blackMoved: boolean): ChessGame {
+function managePromotions(move: Move, game: GameState, blackMoved: boolean): GameState {
     const promotion: Promotion = decodePromotions([move], blackMoved ? -1 : 1)[0];
     game.board[promotion.move.to] = promotion.promote_to;
     game.board[move.from] = PieceCode.EmptySquare;
     return game;
 }
 
-function makeMove(move: Move, game: ChessGame):ChessGame {
+function makeMove(move: Move, game: GameState):GameState {
 
     const blackMoved = game.active_color < 0;
 

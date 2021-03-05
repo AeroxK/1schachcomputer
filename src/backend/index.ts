@@ -6,9 +6,9 @@ import { WebsocketEventNames } from '../shared/api/config';
 import { WebsocketEventDataInterfaces } from '../shared/api/types';
 import * as FenParser from './FenParser/fen-parser';
 import { getLegalSquaresForPiece, makeMove } from './ChessRules/chess-rules';
-import { ChessGame } from '../shared/types';
+import { GameState } from '../shared/types';
 
-let game: ChessGame = FenParser.read('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+let game: GameState = FenParser.read('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 
 const app = express();
 app.use(express.static('dist/assets'));

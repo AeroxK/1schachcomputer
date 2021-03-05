@@ -1,4 +1,4 @@
-import { ChessGame, ActiveColor, Board, PieceCode } from '../../shared/types';
+import { GameState, ActiveColor, Board, PieceCode } from '../../shared/types';
 
 const FenSquares = [
     'a8', 'b8', 'c8', 'd8', 'e8', 'f8', 'g8', 'h8',
@@ -58,7 +58,7 @@ enum FenCastlingCode {
     BlackQueenside = 'q'
 }
 
-export function read(fen: string): ChessGame {
+export function read(fen: string): GameState {
     let [
         fen_board,
         fen_active_color,
@@ -90,7 +90,7 @@ export function read(fen: string): ChessGame {
     }
 }
 
-export function write(game: ChessGame): string {
+export function write(game: GameState): string {
     return '';
 }
 
