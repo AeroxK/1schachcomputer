@@ -4,7 +4,7 @@
   "description": "A chess engine",
   "entryPoint": "dist/backend/index.js",
   "scripts": {
-    "build": "npm run test && npm run clean && tsc && webpack",
+    "build": "npm run test && npm run clean && tsc && webpack --env NODE_ENV=production",
     "clean": "shx rm -rf dist",
     "dev": "concurrently --names \"NODEMON,TSC,WEBPACK\" -c \"#ba68c8,#9575cd,#f06292\" \"npm run watch:server\" \"npm run watch:backend\" \"npm run watch:frontend\"",
     "dev:backend": "concurrently --names \"NODEMON,TSC\" -c \"#ba68c8,#9575cd\" \"npm run watch:server\" \"npm run watch:backend\"",
@@ -12,7 +12,7 @@
     "serve": "node dist/backend/index.js",
     "test": "jest",
     "watch:backend": "tsc -w",
-    "watch:frontend": "webpack --watch",
+    "watch:frontend": "webpack --watch --env NODE_ENV=development",
     "watch:server": "nodemon dist/backend/index.js"
   },
   "author": "Alexander König",
