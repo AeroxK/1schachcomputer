@@ -209,7 +209,7 @@ pawnMoves = (game, square) => {
             [PieceCode.WhiteKnight, PieceCode.WhiteBishop, PieceCode.WhiteRook, PieceCode.WhiteQueen] :
             [PieceCode.BlackKnight, PieceCode.BlackBishop, PieceCode.BlackRook, PieceCode.BlackQueen];
         const promotions: Promotion[] = squares
-            .map(promotionSquare => promotionPieces.map(promote_to => { return { move: { from: square, to: promotionSquare }, promote_to }; }))
+            .map(promotionSquare => promotionPieces.map(promote_to => { return { from: square, to: promotionSquare, promote_to }; }))
             .reduce((allPromotions: Promotion[], current: Promotion[]) => allPromotions.concat(current), []);
         return encodePromotions(promotions, isWhite ? ActiveColor.White : ActiveColor.Black);
     } else {
@@ -282,7 +282,7 @@ function isActiveKingInCheck(game: GameState):boolean {
                 squares.map(square => { return { from: enemyPiece, to: square }; }),
                 game.active_color > 0 ? -1 : 1
             );
-            squares = promotions.map(promotion => promotion.move.to);
+            squares = promotions.map(promotion => promotion.to);
         }
         return squares.includes(kingPosition);
     });
@@ -377,7 +377,7 @@ function manageEnPassant(move: Move, game: GameState, blackMoved: boolean):GameS
 
 function managePromotions(move: Move, game: GameState, blackMoved: boolean): GameState {
     const promotion: Promotion = decodePromotions([move], blackMoved ? -1 : 1)[0];
-    game.board[promotion.move.to] = promotion.promote_to;
+    game.board[promotion.to] = promotion.promote_to;
     game.board[move.from] = PieceCode.EmptySquare;
     return game;
 }

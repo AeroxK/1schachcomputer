@@ -33,8 +33,7 @@ export interface Move {
     to: number
 }
 
-export interface Promotion {
-    move: Move,
+export interface Promotion extends Move {
     promote_to: PieceCode,
 }
 
