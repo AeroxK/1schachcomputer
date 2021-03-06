@@ -1,5 +1,6 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import http from 'http';
+import path from 'path';
 import { Server, Socket } from 'socket.io';
 
 import { WebsocketEventNames } from '../shared/api/config';
@@ -12,6 +13,7 @@ let game: GameState = FenParser.read('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN
 
 const app = express();
 app.use(express.static('dist/assets'));
+app.get(/\/[a-zA-Z0-9]+$/, (req: Request, res: Response) => res.sendFile(path.join(__dirname, '../assets/index.html')));
 
 const httpServer = http.createServer(app);
 const port = 3000;
