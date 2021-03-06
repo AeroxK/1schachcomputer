@@ -1,22 +1,36 @@
 import React, { lazy, Suspense } from 'react';
 import io from 'socket.io-client';
 
+// Material UI
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 import DeleteIcon from '@material-ui/icons/Delete';
 import LoadingSpinner from '../LoadingSpinner/loading-spinner';
+const Dialog = lazy(() => import('@material-ui/core/Dialog'));
 
+// Shared
 import { Board, Move, PieceCode, Promotion } from '../../shared/types';
 import { decodePromotions, encodePromotions } from '../../shared/util';
 import { WebsocketEventNames } from '../../shared/api/config';
 import { WebsocketEventDataInterfaces } from '../../shared/api/types';
 import { concatClasses } from '../shared/util';
 
-const Dialog = lazy(() => import('@material-ui/core/Dialog'));
-
+// Assets
 import './chess-board.scss';
+import BlackRookIcon from './icons/black-rook.svg';
+import BlackKnightIcon from './icons/black-knight.svg';
+import BlackBishopIcon from './icons/black-bishop.svg';
+import BlackQueenIcon from './icons/black-queen.svg';
+import BlackKingIcon from './icons/black-king.svg';
+import BlackPawnIcon from './icons/black-pawn.svg';
+import WhiteRookIcon from './icons/white-rook.svg';
+import WhiteKnightIcon from './icons/white-knight.svg';
+import WhiteBishopIcon from './icons/white-bishop.svg';
+import WhiteQueenIcon from './icons/white-queen.svg';
+import WhiteKingIcon from './icons/white-king.svg';
+import WhitePawnIcon from './icons/white-pawn.svg';
 
 const move = require("./sounds/move.webm").default;
 const moveAudio = new Audio(move);
@@ -42,18 +56,18 @@ type PieceIconMap = {
 }
 
 const PieceIconMaps: PieceIconMap[] = [
-    { pieceCode: PieceCode.BlackRook, url: require('./icons/black-rook.svg') },
-    { pieceCode: PieceCode.BlackBishop, url: require('./icons/black-bishop.svg') },
-    { pieceCode: PieceCode.BlackKnight, url: require('./icons/black-knight.svg') },
-    { pieceCode: PieceCode.BlackQueen, url: require('./icons/black-queen.svg') },
-    { pieceCode: PieceCode.BlackKing, url: require('./icons/black-king.svg') },
-    { pieceCode: PieceCode.BlackPawn, url: require('./icons/black-pawn.svg') },
-    { pieceCode: PieceCode.WhiteRook, url: require('./icons/white-rook.svg') },
-    { pieceCode: PieceCode.WhiteBishop, url: require('./icons/white-bishop.svg') },
-    { pieceCode: PieceCode.WhiteKnight, url: require('./icons/white-knight.svg') },
-    { pieceCode: PieceCode.WhiteQueen, url: require('./icons/white-queen.svg') },
-    { pieceCode: PieceCode.WhiteKing, url: require('./icons/white-king.svg') },
-    { pieceCode: PieceCode.WhitePawn, url: require('./icons/white-pawn.svg') },
+    { pieceCode: PieceCode.BlackRook, url: BlackRookIcon },
+    { pieceCode: PieceCode.BlackKnight, url: BlackKnightIcon },
+    { pieceCode: PieceCode.BlackBishop, url: BlackBishopIcon },
+    { pieceCode: PieceCode.BlackQueen, url: BlackQueenIcon },
+    { pieceCode: PieceCode.BlackKing, url: BlackKingIcon },
+    { pieceCode: PieceCode.BlackPawn, url: BlackPawnIcon },
+    { pieceCode: PieceCode.WhiteRook, url: WhiteRookIcon },
+    { pieceCode: PieceCode.WhiteKnight, url: WhiteKnightIcon },
+    { pieceCode: PieceCode.WhiteBishop, url: WhiteBishopIcon },
+    { pieceCode: PieceCode.WhiteQueen, url: WhiteQueenIcon },
+    { pieceCode: PieceCode.WhiteKing, url: WhiteKingIcon },
+    { pieceCode: PieceCode.WhitePawn, url: WhitePawnIcon },
 ];
 
 export default class ChessBoard extends React.Component<ChessBoardProps, ChessBoardState> {
