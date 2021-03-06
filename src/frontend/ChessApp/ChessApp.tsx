@@ -4,7 +4,9 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import AppBar from '../AppBar/AppBar';
 import LoadingSpinner from '../LoadingSpinner/loading-spinner';
 const ChessGui = lazy(() => import('../ChessGui/ChessGui'));
+const LoginPage = lazy(() => import('../LoginPage/LoginPage'));
 
+import { Routes } from '../shared/config';
 import { RouteDescriptor } from '../shared/types';
 
 export default class ChessApp extends React.Component {
@@ -15,13 +17,17 @@ export default class ChessApp extends React.Component {
 
         this.routes = [
             {
-                path: '/',
+                path: Routes.LoginPage,
                 exact: true,
                 pageTitle: 'Home',
-                render: () => (<div>Login<Link to="/play">Play!</Link></div>)
+                render: () => (
+                    <Suspense fallback={ <LoadingSpinner /> }>
+                        <LoginPage />
+                    </Suspense>
+                )
             },
             {
-                path: '/play',
+                path: Routes.ChessGamePage,
                 pageTitle: 'PlayZone',
                 render: () => (
                     <Suspense fallback={ <LoadingSpinner /> }>
