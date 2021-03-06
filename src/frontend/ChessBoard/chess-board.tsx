@@ -31,9 +31,8 @@ import WhiteBishopIcon from './icons/white-bishop.svg';
 import WhiteQueenIcon from './icons/white-queen.svg';
 import WhiteKingIcon from './icons/white-king.svg';
 import WhitePawnIcon from './icons/white-pawn.svg';
-
-const move = require("./sounds/move.webm").default;
-const moveAudio = new Audio(move);
+import MoveAudio from './sounds/move.webm';
+const moveAudio = new Audio(MoveAudio);
 
 type ChessBoardProps = {
     flipped?: boolean

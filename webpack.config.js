@@ -35,7 +35,7 @@ module.exports = (env) => {
                 },
             { test: /\.(png|svg|jpg|jpeg|gif)$/i, include: path.resolve(__dirname, 'src/frontend'), type: 'asset/resource' },
             { test: /\.(woff|woff2|eot|ttf|otf)$/i, type: 'asset/resource' },
-            { test: /\.webm$/i, include: path.resolve(__dirname, 'src/frontend'), loader: 'file-loader' },
+            { test: /\.webm$/i, include: path.resolve(__dirname, 'src/frontend'), type: 'asset/resource' },
         ],
     },
   };
