@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
-import LoadingSpinner from '../LoadingSpinner/loading-spinner';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 const LoginPage = lazy(() => import('../LoginPage/LoginPage'));
 const LoggedInArea = lazy(() => import('../LoggedInArea/LoggedInArea'));
 

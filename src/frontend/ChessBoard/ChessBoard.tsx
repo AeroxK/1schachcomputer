@@ -7,7 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 import DeleteIcon from '@material-ui/icons/Delete';
-import LoadingSpinner from '../LoadingSpinner/loading-spinner';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 const Dialog = lazy(() => import('@material-ui/core/Dialog'));
 
 // Shared

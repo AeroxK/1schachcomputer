@@ -3,7 +3,7 @@ import { Switch, Route } from 'react-router-dom';
 
 import AppBar from '../AppBar/AppBar';
 const ChessGui = lazy(() => import('../ChessGui/ChessGui'));
-import LoadingSpinner from '../LoadingSpinner/loading-spinner';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 import { RoutePaths } from '../shared/config';
 import { RouteDescriptor } from '../shared/types';
