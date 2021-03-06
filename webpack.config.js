@@ -13,6 +13,7 @@ module.exports = (env) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
+          favicon: './favicon.svg',
           template: path.resolve(__dirname, 'src/frontend/index.html'),
       }),
     ],
