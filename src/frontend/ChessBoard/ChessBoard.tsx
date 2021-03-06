@@ -18,7 +18,7 @@ import { WebsocketEventDataInterfaces } from '../../shared/api/types';
 import { concatClasses } from '../shared/util';
 
 // Assets
-import './chess-board.scss';
+import './ChessBoard.scss';
 import BlackRookIcon from './icons/black-rook.svg';
 import BlackKnightIcon from './icons/black-knight.svg';
 import BlackBishopIcon from './icons/black-bishop.svg';
