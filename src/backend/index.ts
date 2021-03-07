@@ -7,6 +7,8 @@ import { WebsocketEventDataInterfaces } from '../shared/api/types';
 import * as FenParser from './FenParser/fen-parser';
 import { getLegalSquaresForPiece, makeMove } from './ChessRules/chess-rules';
 import { GameState } from '../shared/types';
+import { gameEventLogger, logger, websocketEventLogger } from './Logger/logger';
+import { ActiveColor } from '../shared/types';
 
 let game: GameState = FenParser.read('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 
@@ -39,14 +41,16 @@ io.on(WebsocketEventNames.Connection, (socket: Socket) =>
         socket.on(WebsocketEventNames.MakeMove, (
             { move }: WebsocketEventDataInterfaces[WebsocketEventNames.MakeMove]) =>
             {
+                gameEventLogger.info(`${ActiveColor[game.active_color]} moved from ${move.from} to ${move.to}`)
                 game = makeMove(move, game);
                 const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard] = {
                     board: game.board
                 };
-                io.to('game').emit(WebsocketEventNames.UpdateBoard, eventData);
+                io.to('game').emit(WebsocketEventNames.UpdateBoard, eventData); 
             }
         );
         socket.on(WebsocketEventNames.DiscardGame, () => {
+            gameEventLogger.info(`Game was discarded!`);
             game = FenParser.read('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
             const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateBoard] = {
                 board: game.board
@@ -55,9 +59,10 @@ io.on(WebsocketEventNames.Connection, (socket: Socket) =>
         });
 
         io.to(socket.id).emit(WebsocketEventNames.UpdateBoard, eventData);
+        websocketEventLogger.info(`New connection from: ${socket.handshake.address}`);
     }
 );
 
 httpServer.listen(port, () => {
-    console.log(`1schachcomputer available at http://localhost:${port}`)
+    logger.info(`1schachcomputer available at http://localhost:${port}`)
 });

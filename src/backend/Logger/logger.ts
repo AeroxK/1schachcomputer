@@ -1,31 +1,28 @@
 import * as winston from 'winston';
+import path from 'path';
 
-const { combine, timestamp, label, printf, colorize } = winston.format;
+const { combine, timestamp, printf, colorize } = winston.format;
 
-const gameEventFormat = printf(({level, message, label, timestamp, eventType}) => {
-    return `[${level}] ${timestamp} ${eventType} : ${message}`;
+const logFormat = printf(({level, message, timestamp, eventType}) => {
+    return `[${level}] ${timestamp} ${eventType|| ""}: ${message}`;
 });
 
-const logger: winston.Logger = winston.createLogger({
+const stdout = new winston.transports.Console({level: 'info'});
+const file_out = new winston.transports.File({filename: path.join(process.cwd(), "logs", "log.txt"), maxsize: 10000});
+
+export const logger: winston.Logger = winston.createLogger({
     format: combine(
         timestamp({format: 'YY-MM-DD HH:mm:ss'}),
         colorize(),
-        gameEventFormat
+        logFormat
     ),
-    transports: [
-        new winston.transports.Console({ level: 'info' }), //level = maximum level this transport will log
-        // define file logging here, only for prod
-    ],
 });
+
+if (process.env.NODE_ENV == 'production') {
+    logger.add(file_out);
+} else {
+    logger.add(stdout);
+}
 
 export const gameEventLogger = logger.child({eventType: "GameEvent"});
 export const websocketEventLogger = logger.child({eventType: "WebSocketEvent"});
-
-// Log levels:
-// error: 0, 
-// warn: 1, 
-// info: 2, 
-// http: 3,
-// verbose: 4, 
-// debug: 5, 
-// silly: 6 
