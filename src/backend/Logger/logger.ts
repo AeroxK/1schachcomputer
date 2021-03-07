@@ -18,7 +18,7 @@ export const logger: winston.Logger = winston.createLogger({
     ),
 });
 
-if (process.env.NODE_ENV == 'production') {
+if (process.env.NODE_ENV === 'production') {
     logger.add(file_out);
 } else {
     logger.add(stdout);
