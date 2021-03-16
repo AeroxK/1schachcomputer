@@ -1,4 +1,4 @@
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 import { Board, Move } from '../types';
 import { WebsocketEventNames } from './config';
@@ -30,4 +30,11 @@ export interface WebsocketEventDataInterfaces {
     [WebsocketEventNames.MakeMove]: MakeMoveEventData;
     [WebsocketEventNames.UpdateBoard]: UpdateBoardEventData;
     [WebsocketEventNames.UpdateMoves]: UpdateMovesEventData;
+}
+
+export interface WebsocketController {
+    io: Server;
+    socket: Socket;
+
+    bindEvents: () => void;
 }
