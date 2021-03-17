@@ -4,7 +4,7 @@ import path from 'path';
 const { combine, timestamp, printf, colorize } = winston.format;
 
 const logFormat = printf(({level, message, timestamp, eventType}) => {
-    return `[${level}] ${timestamp} ${eventType|| ""}: ${message}`;
+    return `[${level}] ${timestamp} ${eventType || "DefaultEvent"}: ${message}`;
 });
 
 const stdout = new winston.transports.Console({level: 'info'});
