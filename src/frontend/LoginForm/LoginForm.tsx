@@ -1,11 +1,15 @@
 import React from 'react';
 
+import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Form from '../Form/Form';
 import { loginApiUrl } from '../../shared/api/config';
 
 interface LoginFormProps {
-    onLoggedIn: Function
+    username: string,
+    password: string,
+    handleLogin: Function,
+    handleInputChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
 class LoginForm extends React.Component<LoginFormProps, {}> {
@@ -17,7 +21,7 @@ class LoginForm extends React.Component<LoginFormProps, {}> {
                 if (!response.ok) {
                     throw new Error('Failed')
                 }
-                this.props.onLoggedIn();
+                this.props.handleLogin();
             })
             .catch(err => {
                 //TODO: Error Handling
@@ -34,21 +38,33 @@ class LoginForm extends React.Component<LoginFormProps, {}> {
                 onSubmit={this.handleSubmit}
                 submitButtonLabel="Login"
             >
-                <TextField
-                    required
-                    id="username"
-                    label="Username"
-                    variant="filled"
-                    color="secondary"
-                />
-                <TextField
-                    required
-                    id="password"
-                    label="Password"
-                    type="password"
-                    variant="filled"
-                    color="secondary"
-                />
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        required
+                        id="username"
+                        name="username"
+                        label="Username"
+                        variant="filled"
+                        color="secondary"
+                        value={this.props.username}
+                        onChange={this.props.handleInputChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        fullWidth
+                        required
+                        id="password"
+                        name="password"
+                        label="Password"
+                        type="password"
+                        variant="filled"
+                        color="secondary"
+                        value={this.props.password}
+                        onChange={this.props.handleInputChange}
+                    />
+                </Grid>
             </Form>
         );
     }

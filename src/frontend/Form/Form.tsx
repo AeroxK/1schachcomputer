@@ -1,13 +1,14 @@
-import React, { FormEventHandler, ReactNode } from 'react';
+import React, { FormEventHandler, ReactElement, ReactNode } from 'react';
 
 import { withStyles, WithStyles as WithStylesProps, StyleRules } from '@material-ui/styles';
 import { createMuiTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
 
 interface FormProps extends WithStylesProps<StyleRules> {
     action: string,
-    children: ReactNode[],
+    children: ReactElement<typeof Grid>[],
     headline: string,
     method: "POST" | "GET",
     onSubmit: FormEventHandler<HTMLFormElement>,
@@ -27,7 +28,7 @@ class Form extends React.Component<FormProps, {}> {
                         {this.props.subheadline}
                     </Typography>
                 </div>
-                <div className={this.props.classes.inputWrapper}>{this.props.children}</div>
+                <Grid className={this.props.classes.gridRoot} container spacing={2}>{this.props.children}</Grid>
                 <div>
                     <Button
                         variant="contained"
@@ -48,10 +49,7 @@ export default withStyles({
     headlineWrapper: {
         marginBottom: theme.spacing(2),
     },
-    inputWrapper: {
-        '& > *': {
-            marginBottom: theme.spacing(2),
-            width: '100%',
-        }
+    gridRoot: {
+        marginBottom: theme.spacing(1),
     }
 })(Form);

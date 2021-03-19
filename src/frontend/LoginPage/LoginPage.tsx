@@ -16,6 +16,9 @@ interface LoginPageProps extends WithStylesProps<StyleRules> {
 
 interface LoginPageState {
     tabNumber: number;
+    inputs: {
+        [name: string]: string
+    }
 }
 
 class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
@@ -23,14 +26,30 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
         super(props);
 
         this.state = {
-            tabNumber: 0
+            tabNumber: 0,
+            inputs: {
+                username: '',
+                password: '',
+                repeatedPassword: '',
+            }
         }
 
         this.handleTabChange = this.handleTabChange.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     handleTabChange(event: React.ChangeEvent<{}>, newValue: number) {
         this.setState({ tabNumber: newValue });
+    }
+
+    handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        this.setState({
+            inputs: Object.assign(this.state.inputs, { [name]: value })
+        });
     }
 
     render () {
@@ -46,12 +65,23 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
                             <div className={this.props.classes.tabContent}>
                                 {
                                     this.state.tabNumber === 0 && (
-                                        <LoginForm onLoggedIn={this.props.handleLogin} />
+                                        <LoginForm
+                                            username={this.state.inputs.username}
+                                            password={this.state.inputs.password}
+                                            handleLogin={this.props.handleLogin}
+                                            handleInputChange={this.handleInputChange}
+                                        />
                                     )
                                 }
                                 {
                                     this.state.tabNumber === 1 && (
-                                        <RegisterForm onLoggedIn={this.props.handleLogin} />
+                                        <RegisterForm
+                                            username={this.state.inputs.username}
+                                            password={this.state.inputs.password}
+                                            repeatedPassword={this.state.inputs.repeatedPassword}
+                                            handleLogin={this.props.handleLogin}
+                                            handleInputChange={this.handleInputChange}
+                                        />
                                     )
                                 }
                             </div>
