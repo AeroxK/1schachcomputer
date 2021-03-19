@@ -50,6 +50,6 @@ export default withStyles({
         marginBottom: theme.spacing(2),
     },
     gridRoot: {
-        marginBottom: theme.spacing(1),
+        marginBottom: theme.spacing(2),
     }
 })(Form);
