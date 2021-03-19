@@ -45,9 +45,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-    username: string;
-    password: string;
-    _id: string;
+    token: string;
 }
 
 export interface UserData {

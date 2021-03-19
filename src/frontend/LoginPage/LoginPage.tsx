@@ -9,14 +9,11 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
 import LoginForm from '../LoginForm/LoginForm';
 import RegisterForm from '../RegisterForm/RegisterForm';
-import { LoginResponse } from '../../shared/api/types';
 
 interface LoginPageProps extends WithStylesProps<StyleRules> {
-    handleLogin: (data:LoginResponse) => void,
+    handleLogin: (username:string, token:string) => void,
 }
 
 interface LoginPageState {
@@ -45,12 +42,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
 
         this.handleTabChange = this.handleTabChange.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleLogin = this.handleLogin.bind(this);
         this.handleLoginFailed = this.handleLoginFailed.bind(this);
-    }
-
-    handleLogin(data:LoginResponse) {
-        this.props.handleLogin(data);
     }
 
     handleLoginFailed(reason:string) {
@@ -87,7 +79,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
                                         <LoginForm
                                             username={this.state.inputs.username}
                                             password={this.state.inputs.password}
-                                            handleLogin={this.handleLogin}
+                                            handleLogin={this.props.handleLogin}
                                             handleLoginFailed={this.handleLoginFailed}
                                             handleInputChange={this.handleInputChange}
                                         />
@@ -99,7 +91,7 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
                                             username={this.state.inputs.username}
                                             password={this.state.inputs.password}
                                             repeatedPassword={this.state.inputs.repeatedPassword}
-                                            handleLogin={this.handleLogin}
+                                            handleLogin={this.props.handleLogin}
                                             handleLoginFailed={this.handleLoginFailed}
                                             handleInputChange={this.handleInputChange}
                                         />

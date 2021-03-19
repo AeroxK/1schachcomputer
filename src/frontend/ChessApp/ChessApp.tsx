@@ -26,12 +26,12 @@ export default class ChessApp extends React.Component<{}, ChessAppState> {
         this.handleLogout = this.handleLogout.bind(this);
     }
 
-    handleLogin(data:LoginResponse) {
-        localStorage.setItem('usertoken', data._id);
-        localStorage.setItem('username', data.username);
+    handleLogin(username:string, token: string) {
+        localStorage.setItem('usertoken', token);
+        localStorage.setItem('username', username);
         this.setState({
-            usertoken: data._id,
-            username: data.username
+            usertoken: token,
+            username: username
         });
     }
 

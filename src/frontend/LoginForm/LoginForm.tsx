@@ -5,11 +5,12 @@ import TextField from '@material-ui/core/TextField';
 import Form from '../Form/Form';
 import { loginApiUrl } from '../../shared/api/config';
 import { LoginRequest, LoginResponse } from '../../shared/api/types';
+import { sha256 } from '../shared/util';
 
 interface LoginFormProps {
     username: string,
     password: string,
-    handleLogin: (data:LoginResponse) => void,
+    handleLogin: (username:string, token:string) => void,
     handleLoginFailed: (reason:string) => void,
     handleInputChange: React.ChangeEventHandler<HTMLInputElement>
 }
@@ -28,28 +29,30 @@ class LoginForm extends React.Component<LoginFormProps, {}> {
     handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
         ev.preventDefault();
 
-        const data:LoginRequest = {
-            username: this.props.username,
-            password: this.props.password
-        };
-
-        fetch(loginApiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then(response => {
-            if (!response.ok) {
-                switch (response.status) {
-                    case 404:
-                        throw new Error('Username and/or password incorrect');
+        sha256(this.props.password).then(hashedPW => {
+            const data:LoginRequest = {
+                username: this.props.username,
+                password: hashedPW
+            };
+    
+            fetch(loginApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (!response.ok) {
+                    switch (response.status) {
+                        case 404:
+                            throw new Error('Username and/or password incorrect');
+                    }
                 }
-            }
-            response.json().then((json: LoginResponse) => this.props.handleLogin(json));
-        })
-        .catch((err: Error) => {
-            this.props.handleLoginFailed(err.message);
+                response.json().then((json: LoginResponse) => this.props.handleLogin(this.props.username, json.token));
+            })
+            .catch((err: Error) => {
+                this.props.handleLoginFailed(err.message);
+            });
         });
     }
 
