@@ -13,10 +13,15 @@ interface LoggedInAreaState {
     appDrawerOpen: boolean;
 }
 
-export default class LoggedInArea extends React.Component<{}, LoggedInAreaState> {
+interface LoggedInAreaProps {
+    username: string,
+    handleLogout: () => void
+}
+
+export default class LoggedInArea extends React.Component<LoggedInAreaProps, LoggedInAreaState> {
     routes: RouteDescriptor[];
 
-    constructor(props: {}) {
+    constructor(props: LoggedInAreaProps) {
         super(props);
 
         this.state = {
@@ -46,7 +51,12 @@ export default class LoggedInArea extends React.Component<{}, LoggedInAreaState>
     render() {
         return (
             <div>
-                <AppBar handleMenuClick={this.openDrawer} routes={this.routes} />
+                <AppBar
+                    username={this.props.username}
+                    handleMenuClick={this.openDrawer}
+                    handleLogout={this.props.handleLogout}
+                    routes={this.routes}
+                />
                 <AppDrawer onClose={this.closeDrawer} open={this.state.appDrawerOpen} routes={this.routes} />
                 <Switch>
                     {

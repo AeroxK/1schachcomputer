@@ -7,14 +7,21 @@ import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 import LoginForm from '../LoginForm/LoginForm';
 import RegisterForm from '../RegisterForm/RegisterForm';
+import { LoginResponse } from '../../shared/api/types';
 
 interface LoginPageProps extends WithStylesProps<StyleRules> {
-    handleLogin: Function
+    handleLogin: (data:LoginResponse) => void,
 }
 
 interface LoginPageState {
+    showSnackbar: boolean;
+    snackbarMessage: string;
     tabNumber: number;
     inputs: {
         [name: string]: string
@@ -26,6 +33,8 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
         super(props);
 
         this.state = {
+            showSnackbar: false,
+            snackbarMessage: '',
             tabNumber: 0,
             inputs: {
                 username: '',
@@ -36,6 +45,16 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
 
         this.handleTabChange = this.handleTabChange.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleLogin = this.handleLogin.bind(this);
+        this.handleLoginFailed = this.handleLoginFailed.bind(this);
+    }
+
+    handleLogin(data:LoginResponse) {
+        this.props.handleLogin(data);
+    }
+
+    handleLoginFailed(reason:string) {
+        this.setState({ showSnackbar: true, snackbarMessage: reason });
     }
 
     handleTabChange(event: React.ChangeEvent<{}>, newValue: number) {
@@ -68,7 +87,8 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
                                         <LoginForm
                                             username={this.state.inputs.username}
                                             password={this.state.inputs.password}
-                                            handleLogin={this.props.handleLogin}
+                                            handleLogin={this.handleLogin}
+                                            handleLoginFailed={this.handleLoginFailed}
                                             handleInputChange={this.handleInputChange}
                                         />
                                     )
@@ -79,12 +99,27 @@ class LoginPage extends React.Component<LoginPageProps, LoginPageState> {
                                             username={this.state.inputs.username}
                                             password={this.state.inputs.password}
                                             repeatedPassword={this.state.inputs.repeatedPassword}
-                                            handleLogin={this.props.handleLogin}
+                                            handleLogin={this.handleLogin}
+                                            handleLoginFailed={this.handleLoginFailed}
                                             handleInputChange={this.handleInputChange}
                                         />
                                     )
                                 }
                             </div>
+                            <Snackbar
+                                open={this.state.showSnackbar}
+                                autoHideDuration={6000}
+                                onClose={() => this.setState({showSnackbar: false})}
+                            >
+                                <MuiAlert
+                                    elevation={6}
+                                    variant="filled"
+                                    severity="error"
+                                    onClose={() => this.setState({showSnackbar: false})}
+                                >
+                                    {this.state.snackbarMessage}
+                                </MuiAlert>
+                            </Snackbar>
                         </Paper>
                     </Container>
                 </div>

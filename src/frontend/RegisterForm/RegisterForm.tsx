@@ -4,12 +4,14 @@ import { registerApiUrl } from '../../shared/api/config';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Form from '../Form/Form';
+import { LoginRequest, LoginResponse } from '../../shared/api/types';
 
 interface RegisterFormProps {
     username: string,
     password: string,
     repeatedPassword: string,
-    handleLogin: Function,
+    handleLogin: (data:LoginResponse) => void,
+    handleLoginFailed: (reason:string) => void,
     handleInputChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
@@ -22,21 +24,36 @@ class RegisterForm extends React.Component<RegisterFormProps, {}> {
             password: '',
             repeatedPassword: ''
         }
+
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
         ev.preventDefault();
 
-        fetch(registerApiUrl, { method: "POST" })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed')
+        const data:LoginRequest = {
+            username: this.props.username,
+            password: this.props.password,
+        }
+
+        fetch(registerApiUrl, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (!response.ok) {
+                switch (response.status) {
+                    case 409:
+                        throw new Error('Username has already been claimed')
                 }
-                this.props.handleLogin();
-            })
-            .catch(err => {
-                //TODO: Error Handling
-            });
+            }
+            response.json().then((json: LoginResponse) => this.props.handleLogin(json));
+        })
+        .catch((err:Error) => {
+            this.props.handleLoginFailed(err.message);
+        });
     }
 
     render() {

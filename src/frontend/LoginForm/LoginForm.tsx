@@ -4,28 +4,53 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Form from '../Form/Form';
 import { loginApiUrl } from '../../shared/api/config';
+import { LoginRequest, LoginResponse } from '../../shared/api/types';
 
 interface LoginFormProps {
     username: string,
     password: string,
-    handleLogin: Function,
+    handleLogin: (data:LoginResponse) => void,
+    handleLoginFailed: (reason:string) => void,
     handleInputChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
+interface LoginFormState {
+    error: string
+}
+
 class LoginForm extends React.Component<LoginFormProps, {}> {
+    constructor(props: LoginFormProps) {
+        super(props);
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
     handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
         ev.preventDefault();
 
-        fetch(loginApiUrl, { method: "POST" })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed')
+        const data:LoginRequest = {
+            username: this.props.username,
+            password: this.props.password
+        };
+
+        fetch(loginApiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(response => {
+            if (!response.ok) {
+                switch (response.status) {
+                    case 404:
+                        throw new Error('Username and/or password incorrect');
                 }
-                this.props.handleLogin();
-            })
-            .catch(err => {
-                //TODO: Error Handling
-            });
+            }
+            response.json().then((json: LoginResponse) => this.props.handleLogin(json));
+        })
+        .catch((err: Error) => {
+            this.props.handleLoginFailed(err.message);
+        });
     }
 
     render() {

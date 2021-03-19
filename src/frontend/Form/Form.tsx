@@ -19,7 +19,7 @@ interface FormProps extends WithStylesProps<StyleRules> {
 class Form extends React.Component<FormProps, {}> {
     render() {
         return (
-            <form onSubmit={this.props.onSubmit} action={this.props.action} method={this.props.method} autoComplete="off">
+            <form onSubmit={this.props.onSubmit} action={this.props.action} method={this.props.method}>
                 <div className={this.props.classes.headlineWrapper}>
                     <Typography gutterBottom variant="h5" component="h1">
                         {this.props.headline}

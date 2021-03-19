@@ -38,3 +38,19 @@ export interface WebsocketController {
 
     bindEvents: () => void;
 }
+
+export interface LoginRequest {
+    username: string;
+    password: string;
+}
+
+export interface LoginResponse {
+    username: string;
+    password: string;
+    _id: string;
+}
+
+export interface UserData {
+    username: string;
+    password: string;
+}

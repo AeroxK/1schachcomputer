@@ -7,5 +7,6 @@ export enum WebsocketEventNames {
     UpdateMoves = 'update moves'
 }
 
-export const loginApiUrl = '/login';
-export const registerApiUrl = '/register';
+export const apiPrefix = '/api';
+export const loginApiUrl = `${apiPrefix}/login`;
+export const registerApiUrl = `${apiPrefix}/register`;
