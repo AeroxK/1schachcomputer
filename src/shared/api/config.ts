@@ -1,4 +1,5 @@
 export enum WebsocketEventNames {
+    AuthRejected = 'connect_error',
     Connection = 'connection',
     DiscardGame = 'discard game',
     GetMoves = 'get moves',

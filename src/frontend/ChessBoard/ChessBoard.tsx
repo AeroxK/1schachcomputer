@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import io from 'socket.io-client';
+import SocketIOClient from 'socket.io-client';
 
 // Material UI
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -35,7 +35,8 @@ import MoveAudio from './sounds/move.webm';
 const moveAudio = new Audio(MoveAudio);
 
 type ChessBoardProps = {
-    flipped?: boolean
+    flipped?: boolean,
+    handleLogout: () => void,
 }
 
 type ChessBoardState = {
@@ -92,7 +93,8 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.handleFlipBoardClick = this.handleFlipBoardClick.bind(this);
         this.handlePromotionDialogClose = this.handlePromotionDialogClose.bind(this);
 
-        this.socket = io();
+        this.socket = SocketIOClient.io({ auth: { token: localStorage.getItem('usertoken') || '' } });
+        this.socket.on(WebsocketEventNames.AuthRejected, this.props.handleLogout);
 
         this.socket.on(WebsocketEventNames.UpdateMoves, (
             { origin_square, possible_squares }: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateMoves]) =>

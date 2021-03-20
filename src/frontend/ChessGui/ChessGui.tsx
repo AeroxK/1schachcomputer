@@ -4,7 +4,9 @@ import ChessBoard from '../ChessBoard/ChessBoard';
 
 import './ChessGui.scss';
 
-type ChessGuiProps = {};
+type ChessGuiProps = {
+    handleLogout: () => void;
+};
 
 export default class ChessGui extends React.Component<ChessGuiProps, {}> {
     COMPONENT_CSS_CLASS: string;
@@ -19,7 +21,7 @@ export default class ChessGui extends React.Component<ChessGuiProps, {}> {
         return (
             <div className={`${this.COMPONENT_CSS_CLASS}`}>
                 <div className={`${this.COMPONENT_CSS_CLASS}__board`}>
-                    <ChessBoard />
+                    <ChessBoard handleLogout={this.props.handleLogout} />
                 </div>
             </div>
         )

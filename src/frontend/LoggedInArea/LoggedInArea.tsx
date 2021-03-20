@@ -5,12 +5,15 @@ import AppBar from '../AppBar/AppBar';
 import AppDrawer from '../AppDrawer/AppDrawer';
 const ChessGui = lazy(() => import('../ChessGui/ChessGui'));
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 import { RoutePaths } from '../shared/config';
 import { RouteDescriptor } from '../shared/types';
 
 interface LoggedInAreaState {
     appDrawerOpen: boolean;
+    showSnackbar: boolean;
 }
 
 interface LoggedInAreaProps {
@@ -25,14 +28,15 @@ export default class LoggedInArea extends React.Component<LoggedInAreaProps, Log
         super(props);
 
         this.state = {
-            appDrawerOpen: false
+            appDrawerOpen: false,
+            showSnackbar: false,
         };
 
         this.routes = [
             {
                 path: RoutePaths.ChessGamePage,
                 pageTitle: 'PlayZone',
-                render: () => <ChessGui />
+                render: () => <ChessGui handleLogout={this.props.handleLogout} />
             }
         ];
 
@@ -46,6 +50,10 @@ export default class LoggedInArea extends React.Component<LoggedInAreaProps, Log
 
     openDrawer() {
         this.setState({ appDrawerOpen: true });
+    }
+
+    componentDidMount() {
+        this.setState({ showSnackbar: true });
     }
 
     render() {
@@ -73,6 +81,20 @@ export default class LoggedInArea extends React.Component<LoggedInAreaProps, Log
                         ))
                     }
                 </Switch>
+                <Snackbar
+                    open={this.state.showSnackbar}
+                    autoHideDuration={2000}
+                    onClose={() => this.setState({showSnackbar: false})}
+                >
+                    <MuiAlert
+                        elevation={6}
+                        variant="filled"
+                        severity="success"
+                        onClose={() => this.setState({showSnackbar: false})}
+                    >
+                        Logged in as {this.props.username}
+                    </MuiAlert>
+                </Snackbar>
             </div>
         );
     }
