@@ -7,6 +7,7 @@ const ChessGui = lazy(() => import('../ChessGui/ChessGui'));
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 
 import { RoutePaths } from '../shared/config';
 import { RouteDescriptor } from '../shared/types';
@@ -36,6 +37,7 @@ export default class LoggedInArea extends React.Component<LoggedInAreaProps, Log
             {
                 path: RoutePaths.ChessGamePage,
                 pageTitle: 'PlayZone',
+                icon: SportsEsportsIcon,
                 render: () => <ChessGui handleLogout={this.props.handleLogout} />
             }
         ];
