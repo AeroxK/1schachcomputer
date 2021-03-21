@@ -68,21 +68,23 @@ export default class LoggedInArea extends React.Component<LoggedInAreaProps, Log
                     routes={this.routes}
                 />
                 <AppDrawer onClose={this.closeDrawer} open={this.state.appDrawerOpen} routes={this.routes} />
-                <Switch>
-                    {
-                        this.routes.map((route, i) => (
-                            <Route
-                                key={i}
-                                exact={route.exact || false}
-                                path={route.path}
-                            >
-                                <Suspense fallback={<LoadingSpinner />}>
-                                    <route.render />
-                                </Suspense>
-                            </Route>
-                        ))
-                    }
-                </Switch>
+                <main>
+                    <Switch>
+                        {
+                            this.routes.map((route, i) => (
+                                <Route
+                                    key={i}
+                                    exact={route.exact || false}
+                                    path={route.path}
+                                >
+                                    <Suspense fallback={<LoadingSpinner />}>
+                                        <route.render />
+                                    </Suspense>
+                                </Route>
+                            ))
+                        }
+                    </Switch>
+                </main>
                 <Snackbar
                     open={this.state.showSnackbar}
                     autoHideDuration={2000}

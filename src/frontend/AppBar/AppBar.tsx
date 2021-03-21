@@ -17,9 +17,6 @@ import { RouteDescriptor } from '../shared/types';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        root: {
-            flexGrow: 1,
-        },
         menuButton: {
             marginRight: theme.spacing(2),
         },
@@ -49,52 +46,50 @@ export default function ChessAppBar(props: AppBarProps) {
     };
 
     return (
-        <div className={classes.root}>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton onClick={() => props.handleMenuClick()} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" className={classes.title}>
-                        <Switch>
-                            {
-                                props.routes.map((route, i) => (
-                                    <Route
-                                        key={i}
-                                        path={route.path}
-                                        exact={route.exact || false}
-                                        children={route.pageTitle}
-                                    />
-                                ))
-                            }
-                        </Switch>
-                    </Typography>
-                    <IconButton
-                        aria-controls="logout-menu"
-                        aria-haspopup="true"
-                        onClick={handleAvatarClick}
-                    >
-                        <Avatar>
-                            {props.username.charAt(0)}
-                        </Avatar>
-                    </IconButton>
-                    <Menu
-                        anchorEl={userMenuAnchor}
-                        open={Boolean(userMenuAnchor)}
-                        onClose={handleUserMenuClose}
-                    >
-                        <MenuItem disabled>
-                            <Typography variant="body1" component="p" >Signed in as {props.username}</Typography>
-                        </MenuItem>
-                        <MenuItem onClick={() => props.handleLogout()}>
-                            <ListItemicon>
-                                <ExitToAppIcon />
-                            </ListItemicon>
-                            <Typography variant="body1" component="span">Logout</Typography>
-                        </MenuItem>
-                    </Menu>
-                </Toolbar>
-            </AppBar>
-        </div>
+        <AppBar position="static">
+            <Toolbar>
+                <IconButton onClick={() => props.handleMenuClick()} edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                    <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" className={classes.title}>
+                    <Switch>
+                        {
+                            props.routes.map((route, i) => (
+                                <Route
+                                    key={i}
+                                    path={route.path}
+                                    exact={route.exact || false}
+                                    children={route.pageTitle}
+                                />
+                            ))
+                        }
+                    </Switch>
+                </Typography>
+                <IconButton
+                    aria-controls="logout-menu"
+                    aria-haspopup="true"
+                    onClick={handleAvatarClick}
+                >
+                    <Avatar>
+                        {props.username.charAt(0)}
+                    </Avatar>
+                </IconButton>
+                <Menu
+                    anchorEl={userMenuAnchor}
+                    open={Boolean(userMenuAnchor)}
+                    onClose={handleUserMenuClose}
+                >
+                    <MenuItem disabled>
+                        <Typography variant="body1" component="p" >Signed in as {props.username}</Typography>
+                    </MenuItem>
+                    <MenuItem onClick={() => props.handleLogout()}>
+                        <ListItemicon>
+                            <ExitToAppIcon />
+                        </ListItemicon>
+                        <Typography variant="body1" component="span">Logout</Typography>
+                    </MenuItem>
+                </Menu>
+            </Toolbar>
+        </AppBar>
     );
 }
