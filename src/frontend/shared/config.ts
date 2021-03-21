@@ -3,3 +3,8 @@ export enum RoutePaths {
     LoggedInArea = '/(.+)',
     ChessGamePage = '/play'
 }
+
+export enum StorageKeys {
+    Usertoken = 'usertoken',
+    Username = 'username',
+}

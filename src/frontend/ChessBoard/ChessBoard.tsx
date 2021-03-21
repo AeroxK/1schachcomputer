@@ -32,6 +32,7 @@ import WhiteQueenIcon from './icons/white-queen.svg';
 import WhiteKingIcon from './icons/white-king.svg';
 import WhitePawnIcon from './icons/white-pawn.svg';
 import MoveAudio from './sounds/move.webm';
+import { StorageKeys } from '../shared/config';
 const moveAudio = new Audio(MoveAudio);
 
 type ChessBoardProps = {
@@ -93,7 +94,7 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.handleFlipBoardClick = this.handleFlipBoardClick.bind(this);
         this.handlePromotionDialogClose = this.handlePromotionDialogClose.bind(this);
 
-        this.socket = SocketIOClient.io({ auth: { token: localStorage.getItem('usertoken') || '' } });
+        this.socket = SocketIOClient.io({ auth: { token: localStorage.getItem(StorageKeys.Usertoken) || '' } });
         this.socket.on(WebsocketEventNames.AuthRejected, this.props.handleLogout);
 
         this.socket.on(WebsocketEventNames.UpdateMoves, (
@@ -185,7 +186,8 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
 
     makeMove(move: Move) {
         const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.MakeMove] = {
-            move
+            move,
+            usertoken: localStorage.getItem(StorageKeys.Usertoken) || '',
         };
         this.socket.emit(WebsocketEventNames.MakeMove, eventData);
     }

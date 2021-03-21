@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import jwt from 'jsonwebtoken';
 
 import { WebsocketEventNames } from '../../../shared/api/config';
 import { WebsocketEventDataInterfaces, WebsocketController } from '../../../shared/api/types';
@@ -41,12 +42,15 @@ export default class ChessGameController implements WebsocketController {
     }
 
     private handleMakeMove({
-            move
+            move,
+            usertoken
         }: WebsocketEventDataInterfaces[WebsocketEventNames.MakeMove]) {
-
-            gameEventLogger.info(`${ActiveColor[game.active_color]} moved from ${move.from} to ${move.to}`)
+        const { username } = jwt.decode(usertoken, { json: true }) || {};
+        if (username) {
+            gameEventLogger.info(`${username} (${ActiveColor[game.active_color]}) moved from ${move.from} to ${move.to}`)
             game = makeMove(move, game);
             this.emitBoardUpdate(game);
+        }
     }
 
     private handleDiscardGame() {

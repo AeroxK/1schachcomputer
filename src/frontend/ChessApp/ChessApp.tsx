@@ -1,12 +1,11 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import { LoginResponse } from '../../shared/api/types';
 
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 const LoginPage = lazy(() => import('../LoginPage/LoginPage'));
 const LoggedInArea = lazy(() => import('../LoggedInArea/LoggedInArea'));
 
-import { RoutePaths } from '../shared/config';
+import { RoutePaths, StorageKeys } from '../shared/config';
 
 interface ChessAppState {
     usertoken: string,
@@ -18,8 +17,8 @@ export default class ChessApp extends React.Component<{}, ChessAppState> {
         super(props);
 
         this.state = {
-            usertoken: localStorage.getItem('usertoken') || '',
-            username: localStorage.getItem('username') || '',
+            usertoken: localStorage.getItem(StorageKeys.Usertoken) || '',
+            username: localStorage.getItem(StorageKeys.Username) || '',
         }
 
         this.handleLogin = this.handleLogin.bind(this);
@@ -27,8 +26,8 @@ export default class ChessApp extends React.Component<{}, ChessAppState> {
     }
 
     handleLogin(username:string, token: string) {
-        localStorage.setItem('usertoken', token);
-        localStorage.setItem('username', username);
+        localStorage.setItem(StorageKeys.Usertoken, token);
+        localStorage.setItem(StorageKeys.Username, username);
         this.setState({
             usertoken: token,
             username: username
@@ -36,8 +35,8 @@ export default class ChessApp extends React.Component<{}, ChessAppState> {
     }
 
     handleLogout() {
-        localStorage.removeItem('usertoken');
-        localStorage.removeItem('username');
+        localStorage.removeItem(StorageKeys.Usertoken);
+        localStorage.removeItem(StorageKeys.Username);
         this.setState({
             usertoken: '',
             username: ''
