@@ -1,11 +1,12 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
 
-import ChessBoard from '../ChessBoard/chess-board';
+import ChessBoard from '../ChessBoard/ChessBoard';
 
-import './chess-gui.scss';
+import './ChessGui.scss';
 
-type ChessGuiProps = {};
+type ChessGuiProps = {
+    handleLogout: () => void;
+};
 
 export default class ChessGui extends React.Component<ChessGuiProps, {}> {
     COMPONENT_CSS_CLASS: string;
@@ -19,13 +20,8 @@ export default class ChessGui extends React.Component<ChessGuiProps, {}> {
     render() {
         return (
             <div className={`${this.COMPONENT_CSS_CLASS}`}>
-                <div className={`${this.COMPONENT_CSS_CLASS}__headline`}>
-                    <Typography variant="h5" component="h1" gutterBottom>
-                        1schachcomputer
-                    </Typography>
-                </div>
                 <div className={`${this.COMPONENT_CSS_CLASS}__board`}>
-                    <ChessBoard />
+                    <ChessBoard handleLogout={this.props.handleLogout} />
                 </div>
             </div>
         )

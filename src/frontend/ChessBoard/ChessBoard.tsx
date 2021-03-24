@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import io from 'socket.io-client';
+import SocketIOClient from 'socket.io-client';
 
 // Material UI
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -7,7 +7,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 import DeleteIcon from '@material-ui/icons/Delete';
-import LoadingSpinner from '../LoadingSpinner/loading-spinner';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 const Dialog = lazy(() => import('@material-ui/core/Dialog'));
 
 // Shared
@@ -18,7 +18,7 @@ import { WebsocketEventDataInterfaces } from '../../shared/api/types';
 import { concatClasses } from '../shared/util';
 
 // Assets
-import './chess-board.scss';
+import './ChessBoard.scss';
 import BlackRookIcon from './icons/black-rook.svg';
 import BlackKnightIcon from './icons/black-knight.svg';
 import BlackBishopIcon from './icons/black-bishop.svg';
@@ -32,10 +32,12 @@ import WhiteQueenIcon from './icons/white-queen.svg';
 import WhiteKingIcon from './icons/white-king.svg';
 import WhitePawnIcon from './icons/white-pawn.svg';
 import MoveAudio from './sounds/move.webm';
+import { StorageKeys } from '../shared/config';
 const moveAudio = new Audio(MoveAudio);
 
 type ChessBoardProps = {
-    flipped?: boolean
+    flipped?: boolean,
+    handleLogout: () => void,
 }
 
 type ChessBoardState = {
@@ -92,7 +94,8 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
         this.handleFlipBoardClick = this.handleFlipBoardClick.bind(this);
         this.handlePromotionDialogClose = this.handlePromotionDialogClose.bind(this);
 
-        this.socket = io();
+        this.socket = SocketIOClient.io({ auth: { token: localStorage.getItem(StorageKeys.Usertoken) || '' } });
+        this.socket.on(WebsocketEventNames.AuthRejected, this.props.handleLogout);
 
         this.socket.on(WebsocketEventNames.UpdateMoves, (
             { origin_square, possible_squares }: WebsocketEventDataInterfaces[WebsocketEventNames.UpdateMoves]) =>
@@ -183,7 +186,8 @@ export default class ChessBoard extends React.Component<ChessBoardProps, ChessBo
 
     makeMove(move: Move) {
         const eventData: WebsocketEventDataInterfaces[WebsocketEventNames.MakeMove] = {
-            move
+            move,
+            usertoken: localStorage.getItem(StorageKeys.Usertoken) || '',
         };
         this.socket.emit(WebsocketEventNames.MakeMove, eventData);
     }

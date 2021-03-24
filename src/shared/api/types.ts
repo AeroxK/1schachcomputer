@@ -12,7 +12,7 @@ export interface MovesForPieceEventData {
     request_issuer: string;
 }
 
-export interface MakeMoveEventData {
+export interface MakeMoveEventData extends UserSpecificRequest {
     move: Move;
 }
 
@@ -23,6 +23,10 @@ export interface UpdateBoardEventData {
 export interface UpdateMovesEventData {
     origin_square: number;
     possible_squares: number[];
+}
+
+export interface UserSpecificRequest {
+    usertoken: string;
 }
 
 export interface WebsocketEventDataInterfaces {
@@ -37,4 +41,18 @@ export interface WebsocketController {
     socket: Socket;
 
     bindEvents: () => void;
+}
+
+export interface LoginRequest {
+    username: string;
+    password: string;
+}
+
+export interface LoginResponse {
+    token: string;
+}
+
+export interface UserData {
+    username: string;
+    password: string;
 }

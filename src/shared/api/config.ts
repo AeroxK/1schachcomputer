@@ -1,4 +1,5 @@
 export enum WebsocketEventNames {
+    AuthRejected = 'connect_error',
     Connection = 'connection',
     DiscardGame = 'discard game',
     GetMoves = 'get moves',
@@ -6,3 +7,7 @@ export enum WebsocketEventNames {
     UpdateBoard = 'update board',
     UpdateMoves = 'update moves'
 }
+
+export const apiPrefix = '/api';
+export const loginApiUrl = `${apiPrefix}/login`;
+export const registerApiUrl = `${apiPrefix}/register`;
